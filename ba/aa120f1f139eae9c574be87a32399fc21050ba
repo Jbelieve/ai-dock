@@ -1,0 +1,40 @@
+"AI Dock/Window/NotchPanelController.swift"
+  s_909970ebfbc426::t_d35ea0ac6d0dc8 6-8,15-20,22-23,48,51-57,59-60,62-66,69-70,72-80,88-89,96-99,103-105,108,116,145-189,194-223
+  s_909970ebfbc426::t_77c1ff2137c780 30-31
+"AI Dock/Views/NotchView.swift"
+  s_909970ebfbc426::t_ff829004bca282 5-7,14-19,22-31,44-51,55-56,67-68,75,95-96,105,108-110,115
+"AI Dock/Views/UsagePopoverView.swift"
+  s_909970ebfbc426::t_7bc3ce69b2e06c 38
+"AI Dock/Services/DockSettings.swift"
+  s_909970ebfbc426::t_d15d19a67e512b 28-32
+  s_909970ebfbc426::t_8aa4bb5247f282 46
+  s_909970ebfbc426::t_2c362c6e116aa8 54-55,61
+"AI Dock/Views/SettingsView.swift"
+  s_909970ebfbc426::t_12be77274c374b 114-136
+  s_909970ebfbc426::t_60d203a250faf2 16
+  s_909970ebfbc426::t_ee7df1323459b3 41-43
+"AI Dock/Window/EdgeSnapping.swift"
+  s_909970ebfbc426::t_66708850f35f65 3-6,9-14,18-20,23-28,30-34,36-49
+"AI Dock/App/PreviewExporter.swift"
+  s_909970ebfbc426::t_54bb9e56ebb836 42-44
+"AI Dock/App/AppDelegate.swift"
+  s_909970ebfbc426::t_c9afdb3db01846 33-34
+  s_909970ebfbc426::t_c8516722b4aaaa 63-79
+  s_909970ebfbc426::t_6553452a1009fd 14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "baaa120f1f139eae9c574be87a32399fc21050ba",
+  "prompts": {},
+  "sessions": {
+    "s_909970ebfbc426": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "80870049-304a-45f4-b201-1053d224a457",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Jbelieve <jorge@believe-global.com>"
+    }
+  }
+}
