@@ -124,6 +124,11 @@ struct NotchView: View {
             if !Self.offlineRender {
                 HoverTracker { inside in
                     hoveredID = inside ? snapshot.id : (hoveredID == snapshot.id ? nil : hoveredID)
+                    // Opening the popover should never show stale numbers —
+                    // kick a refresh when the snapshot is older than ~20s.
+                    if inside, Date().timeIntervalSince(snapshot.capturedAt) > 20 {
+                        Task { await store.refresh() }
+                    }
                 }
             }
         }
