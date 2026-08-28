@@ -1,0 +1,19 @@
+"AI Dock/Services/EnvKeys.swift"
+  s_d61ebe6549303d::t_f1379be4eb7e56 1-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "c727d6e162cc6fde68cfd38d5143ffe90de49118",
+  "prompts": {},
+  "sessions": {
+    "s_d61ebe6549303d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "67c6af6e-9980-42c8-a1c7-3d63e54333b8",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Jbelieve <jorge@believe-global.com>"
+    }
+  }
+}
