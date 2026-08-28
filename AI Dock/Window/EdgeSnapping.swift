@@ -1,43 +1,51 @@
 import AppKit
 
-/// Computes where the notch panel should sit: pinned to a screen edge with a
-/// small margin, vertically centred — and "snaps" to the nearest edge when the
-/// user drags it (organic snap-to behaviour).
+/// Geometry for pinning the notch panel flush against a screen edge and for
+/// the magnetic drag-and-snap behaviour. The panel is wider than the visible
+/// tab (popover room on the inner side), so every computation works off the
+/// TAB column, not the panel rect.
 enum EdgeSnapping {
 
-    /// Resting origin for a panel of `size` on the given edge (right/left),
-    /// vertically centred on the main screen — matches the reference mockups.
+    private static func visibleFrame(_ screen: NSScreen?) -> NSRect {
+        (screen ?? NSScreen.main ?? NSScreen.screens[0]).visibleFrame
+    }
+
+    /// Resting origin for a panel of `size` on the given edge, flush against
+    /// it (the tab melts into the edge), vertically centred.
     static func defaultOrigin(for size: NSSize,
                               edge: DockEdge,
                               on screen: NSScreen? = nil) -> NSPoint {
-        let s = screen ?? NSScreen.main ?? NSScreen.screens[0]
-        let visible = s.visibleFrame
-        let x: CGFloat = edge == .right
-            ? visible.maxX - size.width - 4     // tab hugs the right edge
-            : visible.minX + 4                  // tab hugs the left edge
-        let y = visible.midY - size.height / 2
-        return NSPoint(x: x, y: y)
+        let visible = visibleFrame(screen)
+        let x: CGFloat = edge == .right ? visible.maxX - size.width : visible.minX
+        return NSPoint(x: x, y: visible.midY - size.height / 2)
     }
 
-    /// Given a dragged origin, snap to whichever vertical edge is nearer and
-    /// clamp vertically inside the visible area. The whole panel shifts so the
-    /// tab column ends up flush against the chosen edge.
-    static func snappedOrigin(draggedOrigin: NSPoint,
-                              panelSize: NSSize,
-                              on screen: NSScreen? = nil) -> NSPoint {
-        let s = screen ?? NSScreen.main ?? NSScreen.screens[0]
-        let visible = s.visibleFrame
-        let centreX = draggedOrigin.x + panelSize.width / 2
+    /// Which edge is nearer to the tab column's centre.
+    static func nearestEdge(forTabCentreX x: CGFloat,
+                            on screen: NSScreen? = nil) -> DockEdge {
+        let visible = visibleFrame(screen)
+        return abs(x - visible.minX) < abs(visible.maxX - x) ? .left : .right
+    }
 
-        let distToLeft = abs(centreX - visible.minX)
-        let distToRight = abs(visible.maxX - centreX)
+    static func clampY(_ y: CGFloat, panelHeight: CGFloat,
+                       on screen: NSScreen? = nil) -> CGFloat {
+        let visible = visibleFrame(screen)
+        return min(max(y, visible.minY), visible.maxY - panelHeight)
+    }
 
-        let x: CGFloat = distToLeft < distToRight
-            ? visible.minX + 4                  // hug left edge
-            : visible.maxX - panelSize.width - 4 // hug right edge
-
-        let maxY = visible.maxY - panelSize.height
-        let y = min(max(draggedOrigin.y, visible.minY), maxY)
-        return NSPoint(x: x, y: y)
+    /// Panel origin.x that puts the TAB column flush against `edge`, given
+    /// which side of the panel the tab currently occupies. (When the tab sits
+    /// on the far side, the empty popover half hangs off-screen — it's
+    /// transparent, so that's invisible and intentional.)
+    static func flushOriginX(edge: DockEdge, panelWidth: CGFloat,
+                             tabWidth: CGFloat, tabOnRight: Bool,
+                             on screen: NSScreen? = nil) -> CGFloat {
+        let visible = visibleFrame(screen)
+        switch (edge, tabOnRight) {
+        case (.left, false):  return visible.minX
+        case (.left, true):   return visible.minX - (panelWidth - tabWidth)
+        case (.right, false): return visible.maxX - tabWidth
+        case (.right, true):  return visible.maxX - panelWidth
+        }
     }
 }

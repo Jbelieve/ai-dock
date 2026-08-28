@@ -35,7 +35,7 @@ struct UsagePopoverView: View {
             )
 
             usageBlock(
-                title: "All models",
+                title: "Weekly · all models",
                 percent: snapshot.allModelsPercent,
                 fraction: snapshot.allModelsUsedFraction,
                 accent: Dock.Accent.codex,

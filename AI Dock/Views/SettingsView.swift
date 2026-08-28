@@ -13,6 +13,7 @@ struct SettingsView: View {
 
             card("Position") {
                 edgePicker
+                sizeRow
                 refreshRow
             }
 
@@ -37,7 +38,9 @@ struct SettingsView: View {
                 .foregroundStyle(Dock.Ink.tertiary)
                 .frame(maxWidth: .infinity, alignment: .center)
         }
-        .padding(24)
+        .padding(.horizontal, 24)
+        .padding(.bottom, 24)
+        .padding(.top, 34)      // room for the transparent title bar's controls
         .frame(width: 460)
         .background {
             ZStack {
@@ -106,6 +109,29 @@ struct SettingsView: View {
             RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
         }
+    }
+
+    private var sizeRow: some View {
+        HStack(spacing: 10) {
+            Text("Size")
+                .font(.system(size: 13))
+                .foregroundStyle(Dock.Ink.primary)
+            Image(systemName: "circle")
+                .font(.system(size: 8))
+                .foregroundStyle(Dock.Ink.tertiary)
+            Slider(value: $settings.scale, in: 0.75...1.4)
+                .controlSize(.small)
+                .help("Proportional size of the notch — applies live.")
+            Image(systemName: "circle")
+                .font(.system(size: 13))
+                .foregroundStyle(Dock.Ink.tertiary)
+            Text("\(Int((settings.scale * 100).rounded()))%")
+                .font(.system(size: 12))
+                .foregroundStyle(Dock.Ink.secondary)
+                .monospacedDigit()
+                .frame(width: 40, alignment: .trailing)
+        }
+        .padding(.top, 4)
     }
 
     private var refreshRow: some View {

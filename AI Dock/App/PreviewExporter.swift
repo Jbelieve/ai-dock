@@ -39,8 +39,9 @@ enum PreviewExporter {
         store.seedFixedMock()   // 73 / 21 / 52 — identical to the reference images
 
         let view = NotchView(store: store, settings: settings)
-            .frame(width: NotchView.tabWidth + 340,
-                   height: NotchView.panelHeight(forCount: store.snapshots.count))
+            .frame(width: NotchView.tabWidth(scale: settings.scale) + 340,
+                   height: NotchView.panelHeight(forCount: store.snapshots.count,
+                                                 scale: settings.scale))
             .padding(50)
             .background(
                 LinearGradient(colors: [Color(red: 0.30, green: 0.62, blue: 0.78),

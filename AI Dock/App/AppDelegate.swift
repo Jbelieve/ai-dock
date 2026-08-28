@@ -11,6 +11,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var notchPanel: NotchPanelController?
     private var statusItem: NSStatusItem?
     private var refreshTask: Task<Void, Never>?
+    private var settingsWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Offline preview export: render the notch to PNG and quit. Used to
@@ -29,13 +30,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         startUsageTracking()
         installStatusBarItem()
         presentNotch()
-
-        // Re-position the notch if the user flips the edge in Settings.
-        withObservationTracking {
-            _ = settings.edge
-        } onChange: { [weak self] in
-            Task { @MainActor in self?.notchPanel?.reposition() }
-        }
+        // (Edge/scale/provider changes reframe the panel — the panel
+        // controller observes the shared settings itself.)
     }
 
     // MARK: - Notch
@@ -64,8 +60,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func openSettings() {
-        // Opens the SwiftUI Settings scene defined in AIDockApp.
-        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+        // Own window: the Settings-scene selector (`showSettingsWindow:`) was
+        // removed in macOS 15, so an accessory app must host settings itself.
+        if settingsWindow == nil {
+            let hosting = NSHostingController(
+                rootView: SettingsView(settings: settings, store: usageStore))
+            let window = NSWindow(contentViewController: hosting)
+            window.styleMask = [.titled, .closable, .fullSizeContentView]
+            window.titlebarAppearsTransparent = true
+            window.titleVisibility = .hidden
+            window.title = "AI Dock Settings"
+            window.isMovableByWindowBackground = true
+            window.appearance = NSAppearance(named: .darkAqua)
+            window.isReleasedWhenClosed = false
+            window.center()
+            settingsWindow = window
+        }
+        settingsWindow?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
     }
 

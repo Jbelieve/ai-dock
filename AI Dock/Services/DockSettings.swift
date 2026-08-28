@@ -25,6 +25,11 @@ final class DockSettings {
         didSet { defaults.set(refreshInterval, forKey: Keys.refreshInterval) }
     }
 
+    /// Proportional size of the notch (1.0 = reference mockup size).
+    var scale: Double {
+        didSet { defaults.set(scale, forKey: Keys.scale) }
+    }
+
     /// Open the Settings window automatically / launch at login.
     var launchAtLogin: Bool {
         didSet {
@@ -38,6 +43,7 @@ final class DockSettings {
         static let enabledProviders = "dock.enabledProviders"
         static let refreshInterval = "dock.refreshInterval"
         static let launchAtLogin = "dock.launchAtLogin"
+        static let scale = "dock.scale"
     }
 
     init() {
@@ -45,12 +51,14 @@ final class DockSettings {
         defaults.register(defaults: [
             Keys.edge: DockEdge.right.rawValue,
             Keys.refreshInterval: 30.0,
-            Keys.launchAtLogin: false
+            Keys.launchAtLogin: false,
+            Keys.scale: 1.0
         ])
 
         self.edge = DockEdge(rawValue: defaults.string(forKey: Keys.edge) ?? "") ?? .right
         self.refreshInterval = defaults.double(forKey: Keys.refreshInterval)
         self.launchAtLogin = defaults.bool(forKey: Keys.launchAtLogin)
+        self.scale = min(max(defaults.double(forKey: Keys.scale), 0.75), 1.4)
 
         if let arr = defaults.array(forKey: Keys.enabledProviders) as? [String] {
             self.enabledProviderIDs = Set(arr)
