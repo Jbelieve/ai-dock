@@ -12,16 +12,20 @@ struct NotchView: View {
     @State private var ringCenters: [String: CGFloat] = [:]   // id → y in panel coords
     @State private var hoveredID: String?
 
-    private let tabWidth: CGFloat = 92
-    private let topPad: CGFloat = 46
-    private let bottomPad: CGFloat = 46
-    private let ringPitch: CGFloat = 96   // vertical distance between ring centres
+    private let tabWidth: CGFloat = 96
+    private let topPad: CGFloat = 58
+    private let bottomPad: CGFloat = 58
+    private let ringPitch: CGFloat = 118   // vertical distance between ring centres
 
     /// Shared geometry so the NSPanel can size itself to match the SwiftUI view.
-    static let tabWidth: CGFloat = 92
-    static let topPad: CGFloat = 46
-    static let bottomPad: CGFloat = 46
-    static let ringPitch: CGFloat = 96
+    static let tabWidth: CGFloat = 96
+    static let topPad: CGFloat = 58
+    static let bottomPad: CGFloat = 58
+    static let ringPitch: CGFloat = 118
+
+    /// Estimated popover height, used to aim the bubble tail. Only affects the
+    /// vertical placement bias — the tail always lands on the ring centre.
+    private let bubbleHeight: CGFloat = 196
 
     static func panelHeight(forCount n: Int) -> CGFloat {
         topPad + bottomPad + CGFloat(max(1, n)) * ringPitch
@@ -48,7 +52,7 @@ struct NotchView: View {
             .padding(.bottom, bottomPad)
             .padding(.horizontal, (tabWidth - Dock.Metric.ringSize) / 2)
             .frame(width: tabWidth, height: panelHeight)
-            .clipShape(shape)                 // keep ring glow inside the glass
+            .clipShape(shape)                 // keep ring content inside the glass
             .background {
                 GeometryReader { _ in Color.clear }
             }
@@ -57,12 +61,17 @@ struct NotchView: View {
             // Popover on the INNER side, vertically aligned to the active ring.
             if let id = activeID, let snap = store.snapshot(for: id) {
                 let centerY = ringCenters[id] ?? (topPad + Dock.Metric.ringSize / 2)
-                let anchor = min(0.85, max(0.15, centerY / panelHeight))
-                // Offset so the bubble's tail anchor lines up with the ring centre.
-                let bubbleHeight: CGFloat = 168
+                // Bias the bubble above the ring (tail low on the bubble, as in
+                // the mockups) while keeping it inside the panel bounds.
+                let maxA = (centerY - 6) / bubbleHeight
+                let minA = (bubbleHeight - (panelHeight - centerY - 6)) / bubbleHeight
+                let anchor = min(max(0.62, minA, 0.10), maxA, 0.90)
+                // The ZStack centres the bubble vertically, so convert
+                // "tail lands on the ring centre" into an offset from centre.
                 let yShift = centerY - bubbleHeight * anchor
-                UsagePopoverView(snapshot: snap, tailAnchor: anchor)
-                    .offset(x: isRight ? -(tabWidth + 18) : (tabWidth + 18), y: yShift)
+                    + bubbleHeight / 2 - panelHeight / 2
+                UsagePopoverView(snapshot: snap, tailAnchor: anchor, tailOnLeft: !isRight)
+                    .offset(x: isRight ? -(tabWidth + 8) : (tabWidth + 8), y: yShift)
                     .transition(.asymmetric(
                         insertion: .scale(scale: 0.9, anchor: isRight ? .trailing : .leading)
                             .combined(with: .opacity),
@@ -91,16 +100,16 @@ struct NotchView: View {
     private func ringItem(_ snapshot: UsageSnapshot) -> some View {
         let isActive = activeID == snapshot.id
 
-        VStack(spacing: 7) {
+        VStack(spacing: 9) {
             ZStack {
                 ProgressRing(fraction: snapshot.sessionUsedFraction,
                              accent: snapshot.provider.accent)
-                ProviderGlyph(kind: snapshot.provider.glyph, size: 22)
+                ProviderGlyph(kind: snapshot.provider.glyph, size: 24)
             }
-            .scaleEffect(isActive ? 1.1 : 1.0)
+            .scaleEffect(isActive ? 1.08 : 1.0)
 
             Text("\(snapshot.headlinePercent)%")
-                .font(.system(size: 13.5, weight: .semibold, design: .rounded))
+                .font(.system(size: 14, weight: .medium))
                 .foregroundStyle(Dock.Ink.primary)
                 .monospacedDigit()
         }

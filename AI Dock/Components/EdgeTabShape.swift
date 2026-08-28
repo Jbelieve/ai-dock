@@ -1,61 +1,50 @@
 import SwiftUI
 
-/// The silhouette of the floating notch: a vertical glass tab flush against a
-/// screen edge. The flush (edge) side has normal rounded corners; the free
-/// (inner) side has its top and bottom corners pulled *inward* with a smooth
-/// concave curve, producing the subtle scoops seen in the reference mockups
-/// where the wallpaper shows through.
-///
-/// Built from a rounded rectangle whose inner-side corner radius is larger and
-/// concave — implemented as a single continuous path so there are no seams,
-/// hooks, or flat chamfers.
+/// The silhouette of the floating notch: a vertical black tab that melts into
+/// the screen edge like a side-mounted Dynamic Island — matching the reference
+/// mockups. The flush (edge) side flares into the edge at top and bottom with
+/// concave fillets (the wallpaper corner rounds *into* the tab), while the free
+/// (inner) side has normal convex rounded corners.
 struct EdgeTabShape: Shape {
     var edge: DockEdge
-    var outerCorner: CGFloat = 24   // rounding on the flush (edge) side
-    var scoop: CGFloat = 30         // concave inward pull on the inner corners
-
-    var animatableData: CGFloat {
-        get { edge == .left ? 0 : 1 }
-        set { edge = newValue < 0.5 ? .left : .right }
-    }
+    var innerCorner: CGFloat = 28   // convex rounding on the free (inner) side
+    var flare: CGFloat = 40         // concave melt into the screen edge at top/bottom
 
     func path(in rect: CGRect) -> Path {
         var p = Path()
-        let oc = min(outerCorner, rect.width / 2, rect.height / 4)
-        let sc = min(scoop, rect.width, rect.height / 3)
+        let f = min(flare, rect.width, rect.height / 4)
+        let r = min(innerCorner, (rect.width - f) / 1.5, rect.height / 4)
 
         if edge == .right {
-            // RIGHT side flush to the screen edge (rounded oc corners).
-            // LEFT side: top & bottom corners curve inward by `sc`.
-            p.move(to: CGPoint(x: rect.minX, y: rect.minY + sc))
-            // Top-left concave scoop: from the rim down-and-right into the body.
-            p.addQuadCurve(to: CGPoint(x: rect.minX + sc, y: rect.minY),
-                           control: CGPoint(x: rect.minX + sc, y: rect.minY + sc))
-            p.addLine(to: CGPoint(x: rect.maxX - oc, y: rect.minY))
-            p.addQuadCurve(to: CGPoint(x: rect.maxX, y: rect.minY + oc),           // top-right
-                           control: CGPoint(x: rect.maxX, y: rect.minY))
-            p.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY - oc))
-            p.addQuadCurve(to: CGPoint(x: rect.maxX - oc, y: rect.maxY),           // bottom-right
-                           control: CGPoint(x: rect.maxX, y: rect.maxY))
-            p.addLine(to: CGPoint(x: rect.minX + sc, y: rect.maxY))
-            // Bottom-left concave scoop: from the body up-and-left to the rim.
-            p.addQuadCurve(to: CGPoint(x: rect.minX, y: rect.maxY - sc),
-                           control: CGPoint(x: rect.minX + sc, y: rect.maxY - sc))
-            p.closeSubpath()
+            // RIGHT side flush to the screen edge. Top & bottom taper into the
+            // edge with concave fillets; LEFT corners are convex and round.
+            p.move(to: CGPoint(x: rect.maxX, y: rect.minY))
+            p.addQuadCurve(to: CGPoint(x: rect.maxX - f, y: rect.minY + f),
+                           control: CGPoint(x: rect.maxX, y: rect.minY + f))
+            p.addLine(to: CGPoint(x: rect.minX + r, y: rect.minY + f))
+            p.addQuadCurve(to: CGPoint(x: rect.minX, y: rect.minY + f + r),
+                           control: CGPoint(x: rect.minX, y: rect.minY + f))
+            p.addLine(to: CGPoint(x: rect.minX, y: rect.maxY - f - r))
+            p.addQuadCurve(to: CGPoint(x: rect.minX + r, y: rect.maxY - f),
+                           control: CGPoint(x: rect.minX, y: rect.maxY - f))
+            p.addLine(to: CGPoint(x: rect.maxX - f, y: rect.maxY - f))
+            p.addQuadCurve(to: CGPoint(x: rect.maxX, y: rect.maxY),
+                           control: CGPoint(x: rect.maxX, y: rect.maxY - f))
+            p.closeSubpath()   // straight run up the screen edge
         } else {
             // LEFT side flush — mirror.
-            p.move(to: CGPoint(x: rect.maxX, y: rect.minY + sc))
-            p.addQuadCurve(to: CGPoint(x: rect.maxX - sc, y: rect.minY),
-                           control: CGPoint(x: rect.maxX - sc, y: rect.minY + sc))
-            p.addLine(to: CGPoint(x: rect.minX + oc, y: rect.minY))
-            p.addQuadCurve(to: CGPoint(x: rect.minX, y: rect.minY + oc),
-                           control: CGPoint(x: rect.minX, y: rect.minY))
-            p.addLine(to: CGPoint(x: rect.minX, y: rect.maxY - oc))
-            p.addQuadCurve(to: CGPoint(x: rect.minX + oc, y: rect.maxY),
-                           control: CGPoint(x: rect.minX, y: rect.maxY))
-            p.addLine(to: CGPoint(x: rect.maxX - sc, y: rect.maxY))
-            p.addQuadCurve(to: CGPoint(x: rect.maxX, y: rect.maxY - sc),
-                           control: CGPoint(x: rect.maxX - sc, y: rect.maxY - sc))
+            p.move(to: CGPoint(x: rect.minX, y: rect.minY))
+            p.addQuadCurve(to: CGPoint(x: rect.minX + f, y: rect.minY + f),
+                           control: CGPoint(x: rect.minX, y: rect.minY + f))
+            p.addLine(to: CGPoint(x: rect.maxX - r, y: rect.minY + f))
+            p.addQuadCurve(to: CGPoint(x: rect.maxX, y: rect.minY + f + r),
+                           control: CGPoint(x: rect.maxX, y: rect.minY + f))
+            p.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY - f - r))
+            p.addQuadCurve(to: CGPoint(x: rect.maxX - r, y: rect.maxY - f),
+                           control: CGPoint(x: rect.maxX, y: rect.maxY - f))
+            p.addLine(to: CGPoint(x: rect.minX + f, y: rect.maxY - f))
+            p.addQuadCurve(to: CGPoint(x: rect.minX, y: rect.maxY),
+                           control: CGPoint(x: rect.minX, y: rect.maxY - f))
             p.closeSubpath()
         }
         return p

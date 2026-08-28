@@ -9,11 +9,28 @@ import SwiftUI
 enum PreviewExporter {
 
     static let flag = "--export-preview"
+    static let settingsFlag = "--export-settings"
 
     /// Returns the output path if the flag is present, else nil.
     static func outputPath(from args: [String]) -> String? {
         guard let i = args.firstIndex(of: flag), i + 1 < args.count else { return nil }
         return args[i + 1]
+    }
+
+    /// Returns the output path for the settings-window preview, else nil.
+    static func settingsOutputPath(from args: [String]) -> String? {
+        guard let i = args.firstIndex(of: settingsFlag), i + 1 < args.count else { return nil }
+        return args[i + 1]
+    }
+
+    /// Renders the Settings window (with mock data) to PNG and quits.
+    static func runSettings(outputPath: String) {
+        let settings = DockSettings()
+        let store = UsageStore(settings: settings)
+        store.seedFixedMock()
+
+        let view = SettingsView(settings: settings, store: store)
+        write(view: view, to: outputPath)
     }
 
     static func run(outputPath: String) {
@@ -31,6 +48,11 @@ enum PreviewExporter {
                                startPoint: .topLeading, endPoint: .bottomTrailing)
             )
 
+        write(view: view, to: outputPath)
+    }
+
+    /// Shared PNG writer for all preview exports.
+    private static func write(view: some View, to outputPath: String) {
         let renderer = ImageRenderer(content: view)
         renderer.scale = 2.0
         guard let cg = renderer.cgImage else {

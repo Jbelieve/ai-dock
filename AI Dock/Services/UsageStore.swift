@@ -106,6 +106,7 @@ final class UsageStore {
                              glyph: .openAIKnot, accent: Dock.Accent.codex, source: .unknown)
         let gemini = Provider(id: "gemini", displayName: "Gemini",
                               glyph: .geminiStar, accent: Dock.Accent.spark, source: .unknown)
+        detectedProviders = [claude, codex, gemini]
         snapshots = [
             UsageSnapshot(id: claude.id, provider: claude, sessionUsedFraction: 0.73,
                           sessionResetsAt: now.addingTimeInterval(51 * 60),

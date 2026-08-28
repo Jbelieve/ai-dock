@@ -19,6 +19,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             PreviewExporter.run(outputPath: path)
             return
         }
+        if let path = PreviewExporter.settingsOutputPath(from: CommandLine.arguments) {
+            PreviewExporter.runSettings(outputPath: path)
+            return
+        }
 
         NSApp.setActivationPolicy(.accessory)   // no Dock icon
 

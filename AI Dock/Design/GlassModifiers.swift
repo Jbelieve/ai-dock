@@ -30,8 +30,8 @@ extension View {
                     .background(Dock.Surface.notchBody.clipShape(shape))
             } else {
                 self
-                    .background(Dock.Surface.notchBody.opacity(0.82).clipShape(shape))
-                    .glassEffect(.regular.tint(Color.black.opacity(0.55)), in: shape)
+                    .background(Dock.Surface.notchBody.clipShape(shape))
+                    .glassEffect(.regular.tint(Color.black.opacity(0.70)), in: shape)
             }
         }
         .overlay {
@@ -44,13 +44,13 @@ extension View {
         .overlay {
             shape.stroke(
                 LinearGradient(
-                    colors: [Color.white.opacity(0.30), Color.white.opacity(0.05)],
+                    colors: [Color.white.opacity(0.10), Color.white.opacity(0.02)],
                     startPoint: .topLeading, endPoint: .bottomTrailing
                 ),
                 lineWidth: 1
             )
         }
-        .shadow(color: .black.opacity(0.45), radius: 30, x: 0, y: 18)
+        .shadow(color: .black.opacity(0.40), radius: 24, x: 0, y: 14)
     }
 
     /// The deep black glass body of the notch.
@@ -96,8 +96,8 @@ extension View {
                 self.background(Dock.Surface.popoverBody.clipShape(shape))
             } else {
                 self
-                    .background(Dock.Surface.popoverBody.opacity(0.82).clipShape(shape))
-                    .glassEffect(.regular.tint(Color.black.opacity(0.45)), in: shape)
+                    .background(Dock.Surface.popoverBody.clipShape(shape))
+                    .glassEffect(.regular.tint(Color.black.opacity(0.65)), in: shape)
             }
         }
         .overlay {
@@ -110,13 +110,13 @@ extension View {
         .overlay {
             shape.stroke(
                 LinearGradient(
-                    colors: [Color.white.opacity(0.24), Color.white.opacity(0.04)],
+                    colors: [Color.white.opacity(0.10), Color.white.opacity(0.02)],
                     startPoint: .topLeading, endPoint: .bottomTrailing
                 ),
                 lineWidth: 1
             )
         }
-        .shadow(color: .black.opacity(0.5), radius: 40, x: 0, y: 24)
+        .shadow(color: .black.opacity(0.45), radius: 32, x: 0, y: 18)
     }
 
     /// Lighter glass used for the floating usage popover.

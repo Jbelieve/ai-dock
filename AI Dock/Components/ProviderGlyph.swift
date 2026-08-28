@@ -46,8 +46,8 @@ struct ProviderGlyph: View {
         ZStack {
             ForEach(0..<6, id: \.self) { i in
                 Capsule()
-                    .strokeBorder(Color.white, lineWidth: size * 0.10)
-                    .frame(width: size * 0.78, height: size * 0.30)
+                    .strokeBorder(Color.white, lineWidth: size * 0.085)
+                    .frame(width: size * 0.94, height: size * 0.40)
                     .rotationEffect(.degrees(Double(i) * 60))
             }
         }

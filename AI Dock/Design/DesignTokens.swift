@@ -22,14 +22,17 @@ enum Dock {
     // MARK: - Surfaces
 
     enum Surface {
-        /// Deep near-black glass body of the notch.
-        static let notchBody = Color.black.opacity(0.82)
-        /// Hairline highlight that sells the glass edge.
-        static let glassStroke = Color.white.opacity(0.14)
+        /// Deep near-black body of the notch (the mockups are essentially
+        /// pure black — the glass reads through a whisper of translucency).
+        static let notchBody = Color.black.opacity(0.92)
+        /// Hairline highlight that sells the glass edge — barely there.
+        static let glassStroke = Color.white.opacity(0.07)
         /// Soft inner glow at the top of a glass surface.
-        static let glassSheen = Color.white.opacity(0.10)
-        /// Popover body — slightly lifted black glass.
-        static let popoverBody = Color.black.opacity(0.78)
+        static let glassSheen = Color.white.opacity(0.05)
+        /// Popover body — same deep black as the tab.
+        static let popoverBody = Color.black.opacity(0.90)
+        /// Full ring track behind the progress arc.
+        static let ringTrack = Color.white.opacity(0.16)
     }
 
     // MARK: - Text
@@ -37,19 +40,19 @@ enum Dock {
     enum Ink {
         static let primary = Color.white
         static let secondary = Color.white.opacity(0.62)
-        static let tertiary = Color.white.opacity(0.40)
+        static let tertiary = Color.white.opacity(0.45)
     }
 
     // MARK: - Geometry
 
     enum Metric {
-        static let ringSize: CGFloat = 52
+        static let ringSize: CGFloat = 58
         static let ringStroke: CGFloat = 5
         static let glyphInset: CGFloat = 16
-        static let notchWidth: CGFloat = 92
-        static let notchRadius: CGFloat = 40
+        static let notchWidth: CGFloat = 96
+        static let notchRadius: CGFloat = 28
         static let itemSpacing: CGFloat = 14
-        static let popoverRadius: CGFloat = 26
+        static let popoverRadius: CGFloat = 24
         static let barHeight: CGFloat = 7
         static let barRadius: CGFloat = 4
     }

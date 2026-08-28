@@ -12,11 +12,10 @@ struct UsageBar: View {
         GeometryReader { geo in
             ZStack(alignment: .leading) {
                 Capsule()
-                    .fill(Color.white.opacity(0.12))
+                    .fill(Color.white.opacity(0.15))
                 Capsule()
                     .fill(accent)
-                    .frame(width: max(4, geo.size.width * CGFloat(max(0.01, animated))))
-                    .shadow(color: accent.opacity(0.5), radius: 4)
+                    .frame(width: max(7, geo.size.width * CGFloat(max(0.01, animated))))
             }
         }
         .frame(height: Dock.Metric.barHeight)
