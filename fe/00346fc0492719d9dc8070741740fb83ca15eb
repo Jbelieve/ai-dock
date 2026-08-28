@@ -1,0 +1,20 @@
+"AI Dock/Resources/Assets.xcassets/AppIcon.appiconset/Contents.json"
+  s_909970ebfbc426::t_8a17d88d2238a7 6
+  s_909970ebfbc426::t_7379f19c94de12 3-5,7-12,14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "fe00346fc0492719d9dc8070741740fb83ca15eb",
+  "prompts": {},
+  "sessions": {
+    "s_909970ebfbc426": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "80870049-304a-45f4-b201-1053d224a457",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Jbelieve <jorge@believe-global.com>"
+    }
+  }
+}
