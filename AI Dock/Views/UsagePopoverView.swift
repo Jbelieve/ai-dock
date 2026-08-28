@@ -31,7 +31,8 @@ struct UsagePopoverView: View {
                 percent: snapshot.sessionPercent,
                 fraction: snapshot.sessionUsedFraction,
                 accent: snapshot.provider.accent,
-                resetLabel: resetText(for: snapshot.sessionResetsAt, style: .relative)
+                resetLabel: resetText(for: snapshot.sessionResetsAt, style: .relative),
+                hasData: snapshot.hasData
             )
 
             usageBlock(
@@ -39,7 +40,8 @@ struct UsagePopoverView: View {
                 percent: snapshot.allModelsPercent,
                 fraction: snapshot.allModelsUsedFraction,
                 accent: Dock.Accent.codex,
-                resetLabel: resetText(for: snapshot.allModelsResetsAt, style: .absolute)
+                resetLabel: resetText(for: snapshot.allModelsResetsAt, style: .absolute),
+                hasData: snapshot.hasData
             )
         }
         .padding(.leading, tailOnLeft ? 36 : 22)
@@ -52,7 +54,8 @@ struct UsagePopoverView: View {
 
     @ViewBuilder
     private func usageBlock(title: String, percent: Int, fraction: Double,
-                            accent: Color, resetLabel: String?) -> some View {
+                            accent: Color, resetLabel: String?,
+                            hasData: Bool = true) -> some View {
         VStack(alignment: .leading, spacing: 7) {
             HStack(alignment: .firstTextBaseline) {
                 Text(title)
@@ -65,10 +68,11 @@ struct UsagePopoverView: View {
                         .foregroundStyle(Dock.Ink.tertiary)
                 }
             }
-            UsageBar(fraction: fraction, accent: accent)
-            Text("\(percent)% Used")
+            UsageBar(fraction: hasData ? fraction : 0, accent: accent)
+            Text(hasData ? "\(percent)% Used" : "Waiting for live data…")
                 .font(.system(size: 12.5))
-                .foregroundStyle(Dock.Ink.primary.opacity(0.92))
+                .foregroundStyle(hasData ? Dock.Ink.primary.opacity(0.92)
+                                         : Dock.Ink.tertiary)
                 .monospacedDigit()
         }
     }

@@ -44,7 +44,8 @@ enum ProviderRegistry {
             sessionResetsAt: estimate?.sessionReset,
             allModelsUsedFraction: estimate?.allModels ?? 0,
             allModelsResetsAt: estimate?.allReset,
-            capturedAt: now
+            capturedAt: now,
+            hasData: estimate != nil
         )
     }
 }

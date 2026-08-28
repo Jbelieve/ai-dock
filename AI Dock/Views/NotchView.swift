@@ -111,9 +111,9 @@ struct NotchView: View {
             }
             .scaleEffect(isActive ? 1.08 : 1.0)
 
-            Text("\(snapshot.headlinePercent)%")
+            Text(snapshot.hasData ? "\(snapshot.headlinePercent)%" : "—")
                 .font(.system(size: 14 * k, weight: .medium))
-                .foregroundStyle(Dock.Ink.primary)
+                .foregroundStyle(snapshot.hasData ? Dock.Ink.primary : Dock.Ink.tertiary)
                 .monospacedDigit()
         }
         .frame(height: ringPitch)

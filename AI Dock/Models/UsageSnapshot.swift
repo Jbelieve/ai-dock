@@ -16,6 +16,10 @@ struct UsageSnapshot: Identifiable, Hashable {
 
     /// When this snapshot was captured — drives the live countdown text.
     let capturedAt: Date
+
+    /// False when no real reading exists yet (endpoint rate-limited on first
+    /// launch, etc.) — the UI shows "—" instead of a misleading 0%.
+    var hasData: Bool = true
 }
 
 extension UsageSnapshot {

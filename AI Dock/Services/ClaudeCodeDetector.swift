@@ -118,9 +118,13 @@ enum ClaudeCodeDetector {
               let five = window(json, "five_hour"),
               let week = window(json, "seven_day")
         else {
-            // 429 = we (or another tool on this Mac) polled too hard; back off
-            // hard so the endpoint recovers. Other failures retry sooner.
-            backoffUntil = now.addingTimeInterval(status == 429 ? 300 : 120)
+            // 429 = we (or another tool on this Mac) polled too hard. The
+            // endpoint says exactly how long the penalty lasts (Retry-After,
+            // seen up to ~1h) — respect it; retrying earlier just wastes it.
+            let retryAfter = (resp as? HTTPURLResponse)?
+                .value(forHTTPHeaderField: "Retry-After").flatMap(Double.init)
+            backoffUntil = now.addingTimeInterval(
+                retryAfter ?? (status == 429 ? 300 : 120))
             return cached.map(clamped)
         }
 
