@@ -1,0 +1,100 @@
+name: Release macOS
+
+# Compila, firma y notariza AI Dock en el runner self-hosted (Mac de Jorge,
+# Apple Silicon) — mismo método que Believable/BeWork. Se dispara al pushear
+# un tag vX.Y.Z (o a mano). Al terminar crea el GitHub Release del tag y sube
+# el DMG + ZIP.
+#
+# Diferencias vs Believable (app Electron): AI Dock es SwiftUI nativo, así que
+# no hay npm/electron-builder — es xcodebuild + codesign + notarytool. Y como
+# el runner ES el Mac de Jorge, el certificado Developer ID ya vive en su
+# login keychain: se firma directo, sin importar P12 desde secrets.
+# (La primera vez macOS puede mostrar un prompt "codesign quiere usar la
+# llave…" → click en "Permitir siempre" y las siguientes corren solas.)
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  SIGN_IDENTITY: "Developer ID Application: BELIEVE IT GROUP SAS (35R4W3WK5T)"
+  APP_NAME: "AI Dock"
+
+jobs:
+  build:
+    runs-on: [self-hosted, macOS, ARM64]
+    steps:
+      - uses: actions/checkout@v4
+
+      # En self-hosted el workspace persiste entre releases: sin esto, un
+      # artefacto viejo se adjuntaría al release equivocado.
+      - name: Clean previous artifacts (self-hosted)
+        run: rm -rf release build
+
+      - name: Archive (Release, arm64)
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          xcodebuild -project "AI Dock.xcodeproj" -scheme "AI Dock" \
+            -configuration Release -destination 'generic/platform=macOS' \
+            -archivePath "build/AIDock.xcarchive" archive \
+            CODE_SIGNING_ALLOWED=NO \
+            MARKETING_VERSION="$VERSION" \
+            -quiet
+
+      - name: Sign (Developer ID, hardened runtime)
+        run: |
+          set -euo pipefail
+          APP="build/AIDock.xcarchive/Products/Applications/$APP_NAME.app"
+          codesign --force --options runtime --timestamp \
+            --entitlements "AI Dock/Resources/AIDock.entitlements" \
+            --sign "$SIGN_IDENTITY" "$APP"
+          codesign --verify --strict --verbose=2 "$APP"
+
+      - name: Notarize & staple
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          APP="build/AIDock.xcarchive/Products/Applications/$APP_NAME.app"
+          ditto -c -k --keepParent "$APP" "build/notarize.zip"
+          xcrun notarytool submit "build/notarize.zip" \
+            --apple-id "$APPLE_ID" --password "$APPLE_APP_SPECIFIC_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" --wait
+          xcrun stapler staple "$APP"
+
+      - name: Package DMG + ZIP
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          APP="build/AIDock.xcarchive/Products/Applications/$APP_NAME.app"
+          mkdir -p release
+          # ZIP del .app ya stapleado (descarga directa / futura vía de update).
+          ditto -c -k --keepParent "$APP" "release/AI-Dock-$VERSION-mac.zip"
+          # DMG con acceso directo a /Applications.
+          STAGE=$(mktemp -d)
+          cp -R "$APP" "$STAGE/"
+          ln -s /Applications "$STAGE/Applications"
+          hdiutil create -volname "$APP_NAME" -srcfolder "$STAGE" -ov \
+            -format UDZO "release/AI-Dock-$VERSION.dmg"
+          codesign --force --timestamp --sign "$SIGN_IDENTITY" "release/AI-Dock-$VERSION.dmg"
+          rm -rf "$STAGE"
+
+      # Idempotente: si el Release del tag ya existe, no falla.
+      - name: Ensure GitHub Release exists
+        if: startsWith(github.ref, 'refs/tags/')
+        run: gh release view "${{ github.ref_name }}" >/dev/null 2>&1 || gh release create "${{ github.ref_name }}" --generate-notes || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Attach DMG/ZIP to Release
+        if: startsWith(github.ref, 'refs/tags/')
+        run: gh release upload "${{ github.ref_name }}" release/*.dmg release/*.zip --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

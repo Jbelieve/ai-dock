@@ -2,3 +2,4 @@ build/
 preview-*.png
 .DS_Store
 xcuserdata/
+.claude/
