@@ -1,0 +1,28 @@
+"AI Dock/Views/NotchView.swift"
+  s_909970ebfbc426::t_03bfcf66500713 114,116
+"AI Dock/Services/ProviderRegistry.swift"
+  s_909970ebfbc426::t_3c4bbd58462e0e 47-48
+"AI Dock/Services/ClaudeCodeDetector.swift"
+  s_909970ebfbc426::t_1e12d8de41ab1d 121-127
+"AI Dock/Models/UsageSnapshot.swift"
+  s_909970ebfbc426::t_2ecf1320031595 19-22
+"AI Dock/Views/UsagePopoverView.swift"
+  s_909970ebfbc426::t_a8e6a0e1cf28db 34-35,43-44
+  s_909970ebfbc426::t_9eebcf486f8ada 57-58,71-72,74-75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "ad3975ac800a0f0e534a852f6cbc528cdc4989b4",
+  "prompts": {},
+  "sessions": {
+    "s_909970ebfbc426": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "80870049-304a-45f4-b201-1053d224a457",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Jbelieve <jorge@believe-global.com>"
+    }
+  }
+}
