@@ -1,5 +1,6 @@
 # AI Dock
 
+<img width="1254" height="1254" alt="icon-iadock" src="https://github.com/user-attachments/assets/55bcb730-6f1c-4626-a675-3799c249bc62" />
 A premium macOS utility: a floating **liquid-glass edge tab** that watches your
 **live local AI subscriptions** (Claude, Codex, Gemini, …) and shows per-session
 usage — built for **macOS 26 (Tahoe)** with the native Liquid Glass API.
