@@ -1,0 +1,26 @@
+"AI Dock/App/AppDelegate.swift"
+  s_909970ebfbc426::t_f17143d14871f0 84-86
+"AI Dock/Services/UsageStore.swift"
+  s_909970ebfbc426::t_a0cdff0267c0e4 43
+  s_909970ebfbc426::t_f1ce9ab539ab9c 36
+"AI Dock/Services/ProviderRegistry.swift"
+  s_909970ebfbc426::t_6d7de6ce453886 23,30
+"AI Dock/Services/ClaudeCodeDetector.swift"
+  s_909970ebfbc426::t_f1539a3b831e2b 77-82,84,87-88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "df71d851b691efeef9327b55e24c85f32082530d",
+  "prompts": {},
+  "sessions": {
+    "s_909970ebfbc426": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "80870049-304a-45f4-b201-1053d224a457",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Jbelieve <jorge@believe-global.com>"
+    }
+  }
+}
