@@ -1,0 +1,56 @@
+"AI Dock.xcodeproj/project.pbxproj"
+  s_909970ebfbc426::t_995f2106d0646d 57
+  s_909970ebfbc426::t_6f99c9061df942 279
+  s_909970ebfbc426::t_36b3479d0c0e7c 26
+  s_909970ebfbc426::t_59d0eda459ecf4 180
+"AI Dock/Components/ProviderGlyph.swift"
+  s_909970ebfbc426::t_02cd8c871915f1 3-5,12-20,23,27-32
+"AI Dock/Resources/Assets.xcassets/BrandGemini.imageset/Contents.json"
+  s_909970ebfbc426::t_f0355bd8b48ddf 1-16
+"AI Dock/Components/HoverTracker.swift"
+  s_909970ebfbc426::t_127e034468c08b 1-41
+"AI Dock/Services/ProviderRegistry.swift"
+  s_909970ebfbc426::t_466bbde0f05e6a 19-23,28,30
+"AI Dock/Resources/Assets.xcassets/BrandGemini.imageset/gemini.svg"
+  s_909970ebfbc426::t_31859e78fa0861 1
+"AI Dock/Resources/Assets.xcassets/BrandClaude.imageset/claude.svg"
+  s_909970ebfbc426::t_31859e78fa0861 1
+"AI Dock/Resources/Assets.xcassets/BrandClaude.imageset/Contents.json"
+  s_909970ebfbc426::t_5415cf60193ea1 1-16
+"AI Dock/Resources/Assets.xcassets/BrandOpenAI.imageset/openai.svg"
+  s_909970ebfbc426::t_31859e78fa0861 1
+"AI Dock/App/AppDelegate.swift"
+  s_909970ebfbc426::t_698b7b9cbeb699 72
+  s_909970ebfbc426::t_9c69f37fa5c10c 66
+  s_909970ebfbc426::t_3de6548d6976f7 76
+"AI Dock/Services/UsageStore.swift"
+  s_909970ebfbc426::t_a96e45d3e03c23 41-44
+"AI Dock/Views/NotchView.swift"
+  s_909970ebfbc426::t_7d726b37e72468 126-129
+  s_909970ebfbc426::t_f95b9a501751dd 123-125,130
+  s_909970ebfbc426::t_e0563985693593 30-34
+"AI Dock/Resources/Assets.xcassets/BrandOpenAI.imageset/Contents.json"
+  s_909970ebfbc426::t_7a42bc9cbff5e4 1-16
+"AI Dock/Services/ClaudeCodeDetector.swift"
+  s_909970ebfbc426::t_410514bdafb30a 68-110
+"AI Dock/Window/NotchPanelController.swift"
+  s_909970ebfbc426::t_65aaeb73f022e5 105-128
+"AI Dock/Services/CodexCLIDetector.swift"
+  s_909970ebfbc426::t_ce5c72ee853097 64-134
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "83fc5c59325ca85cb88b29ad32c824b845260927",
+  "prompts": {},
+  "sessions": {
+    "s_909970ebfbc426": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "80870049-304a-45f4-b201-1053d224a457",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Jbelieve <jorge@believe-global.com>"
+    }
+  }
+}
