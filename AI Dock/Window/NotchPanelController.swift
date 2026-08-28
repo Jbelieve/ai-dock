@@ -102,6 +102,30 @@ private final class DraggableNotchPanel: NSPanel {
         setFrameOrigin(NSPoint(x: start.x + (now.x - down.x), y: start.y + (now.y - down.y)))
     }
 
+    /// Right-click anywhere on the tab: quick menu (Settings / Refresh / Quit).
+    /// This is the reliable entry point even when the menu-bar status item is
+    /// hidden by a crowded menu bar.
+    override func rightMouseDown(with event: NSEvent) {
+        let menu = NSMenu()
+        let items: [(String, Selector)] = [
+            ("Settings…", #selector(AppDelegate.openSettings)),
+            ("Refresh usage", #selector(AppDelegate.refreshUsage))
+        ]
+        for (title, action) in items {
+            let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
+            item.target = NSApp.delegate
+            menu.addItem(item)
+        }
+        menu.addItem(.separator())
+        let quit = NSMenuItem(title: "Quit AI Dock",
+                              action: #selector(AppDelegate.quit), keyEquivalent: "")
+        quit.target = NSApp.delegate
+        menu.addItem(quit)
+        if let contentView {
+            NSMenu.popUpContextMenu(menu, with: event, for: contentView)
+        }
+    }
+
     override func mouseUp(with event: NSEvent) {
         guard dragStartOrigin != nil else { super.mouseUp(with: event); return }
         let target = EdgeSnapping.snappedOrigin(draggedOrigin: frame.origin, panelSize: frame.size)

@@ -38,7 +38,10 @@ final class UsageStore {
         self.detectedProviders = detected
 
         let visible = detected.filter { settings.isEnabled($0.id) }
-        let fresh = visible.map { ProviderRegistry.snapshot(for: $0) }
+        var fresh: [UsageSnapshot] = []
+        for provider in visible {
+            fresh.append(await ProviderRegistry.snapshot(for: provider))
+        }
 
         // Stable merge: keep existing slots, append new, drop gone.
         var next: [UsageSnapshot] = []

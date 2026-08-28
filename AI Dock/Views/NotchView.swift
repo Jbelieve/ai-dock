@@ -27,6 +27,11 @@ struct NotchView: View {
     /// vertical placement bias — the tail always lands on the ring centre.
     private let bubbleHeight: CGFloat = 196
 
+    /// Offline preview export: ImageRenderer can't draw NSViewRepresentables
+    /// (they'd show as placeholder blocks), so skip the hover tracker there.
+    private static let offlineRender =
+        ProcessInfo.processInfo.environment["AIDOCK_OPAQUE_GLASS"] == "1"
+
     static func panelHeight(forCount n: Int) -> CGFloat {
         topPad + bottomPad + CGFloat(max(1, n)) * ringPitch
     }
@@ -115,8 +120,14 @@ struct NotchView: View {
         }
         .frame(height: ringPitch)
         .contentShape(Rectangle())
-        .onHover { inside in
-            hoveredID = inside ? snapshot.id : (hoveredID == snapshot.id ? nil : hoveredID)
+        .background {
+            // .onHover never fires in a non-activating accessory panel;
+            // HoverTracker uses an .activeAlways NSTrackingArea instead.
+            if !Self.offlineRender {
+                HoverTracker { inside in
+                    hoveredID = inside ? snapshot.id : (hoveredID == snapshot.id ? nil : hoveredID)
+                }
+            }
         }
         .onTapGesture {
             store.expandedProviderID = (store.expandedProviderID == snapshot.id) ? nil : snapshot.id

@@ -23,6 +23,7 @@
 		A10000000000000000000060 /* NotchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000060 /* NotchView.swift */; };
 		A10000000000000000000061 /* UsagePopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000061 /* UsagePopoverView.swift */; };
 		A10000000000000000000070 /* ProgressRing.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000070 /* ProgressRing.swift */; };
+		A1000000000000000000A1A1 /* HoverTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000A1A1 /* HoverTracker.swift */; };
 		A10000000000000000000071 /* ProviderGlyph.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000071 /* ProviderGlyph.swift */; };
 		A10000000000000000000072 /* UsageBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000072 /* UsageBar.swift */; };
 		A10000000000000000000054 /* DockSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000054 /* DockSettings.swift */; };
@@ -53,6 +54,7 @@
 		A20000000000000000000060 /* NotchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchView.swift; sourceTree = "<group>"; };
 		A20000000000000000000061 /* UsagePopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsagePopoverView.swift; sourceTree = "<group>"; };
 		A20000000000000000000070 /* ProgressRing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressRing.swift; sourceTree = "<group>"; };
+		A2000000000000000000A1A1 /* HoverTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoverTracker.swift; sourceTree = "<group>"; };
 		A20000000000000000000071 /* ProviderGlyph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderGlyph.swift; sourceTree = "<group>"; };
 		A20000000000000000000072 /* UsageBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageBar.swift; sourceTree = "<group>"; };
 		A20000000000000000000054 /* DockSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockSettings.swift; sourceTree = "<group>"; };
@@ -175,6 +177,7 @@
 			isa = PBXGroup;
 			children = (
 				A20000000000000000000070 /* ProgressRing.swift */,
+				A2000000000000000000A1A1 /* HoverTracker.swift */,
 				A20000000000000000000071 /* ProviderGlyph.swift */,
 				A20000000000000000000072 /* UsageBar.swift */,
 				A20000000000000000000073 /* EdgeTabShape.swift */,
@@ -273,6 +276,7 @@
 				A10000000000000000000060 /* NotchView.swift in Sources */,
 				A10000000000000000000061 /* UsagePopoverView.swift in Sources */,
 				A10000000000000000000070 /* ProgressRing.swift in Sources */,
+				A1000000000000000000A1A1 /* HoverTracker.swift in Sources */,
 				A10000000000000000000071 /* ProviderGlyph.swift in Sources */,
 				A10000000000000000000072 /* UsageBar.swift in Sources */,
 				A10000000000000000000054 /* DockSettings.swift in Sources */,

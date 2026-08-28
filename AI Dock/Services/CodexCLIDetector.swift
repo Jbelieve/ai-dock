@@ -61,4 +61,75 @@ enum CodexCLIDetector {
         let s = UsageMetrics.score(dates: dates, sessionCap: 30, weeklyCap: 150)
         return (s.session, s.allModels, s.sessionReset, s.allModelsReset)
     }
+
+    // MARK: - Real usage (rate_limits cached in session rollouts)
+
+    /// Real usage percentages from OpenAI's servers: the Codex CLI persists
+    /// `rate_limits` (primary = 5h window, secondary = weekly) with every
+    /// token-count event in its session JSONLs. We read the last one from the
+    /// newest session. A window whose reset time already passed reads as 0%.
+    static func readRealUsage() -> (session: Double, allModels: Double, sessionReset: Date?, allReset: Date?)? {
+        guard let newest = newestSessionFile(),
+              let handle = try? FileHandle(forReadingFrom: newest) else { return nil }
+        defer { try? handle.close() }
+
+        // Only the tail — session files grow large and rate_limits repeats.
+        let size = (try? handle.seekToEnd()) ?? 0
+        let tailBytes: UInt64 = 512 * 1024
+        try? handle.seek(toOffset: size > tailBytes ? size - tailBytes : 0)
+        guard let data = try? handle.readToEnd(),
+              let text = String(data: data, encoding: .utf8) else { return nil }
+
+        var latest: [String: Any]?
+        for line in text.split(separator: "\n") where line.contains("rate_limit") {
+            guard let obj = try? JSONSerialization.jsonObject(with: Data(line.utf8)) else { continue }
+            if let rl = findRateLimits(in: obj) { latest = rl }
+        }
+        guard let rl = latest else { return nil }
+
+        func window(_ key: String) -> (Double, Date?)? {
+            guard let w = rl[key] as? [String: Any],
+                  let pct = w["used_percent"] as? Double else { return nil }
+            let reset = (w["resets_at"] as? Double).map { Date(timeIntervalSince1970: $0) }
+            // Cached value from an old session: if the window already reset,
+            // the real current usage is 0.
+            if let reset, reset < Date() { return (0, nil) }
+            return (min(1, max(0, pct / 100)), reset)
+        }
+        guard let primary = window("primary") else { return nil }
+        let secondary = window("secondary")
+        return (primary.0, secondary?.0 ?? 0, primary.1, secondary?.1)
+    }
+
+    /// Recursively locate a dict that looks like a rate_limits payload
+    /// (schema position varies between Codex CLI versions).
+    private static func findRateLimits(in object: Any) -> [String: Any]? {
+        guard let dict = object as? [String: Any] else {
+            if let arr = object as? [Any] {
+                for item in arr { if let hit = findRateLimits(in: item) { return hit } }
+            }
+            return nil
+        }
+        if let primary = dict["primary"] as? [String: Any],
+           primary["used_percent"] != nil {
+            return dict
+        }
+        for value in dict.values {
+            if let hit = findRateLimits(in: value) { return hit }
+        }
+        return nil
+    }
+
+    private static func newestSessionFile() -> URL? {
+        let fm = FileManager.default
+        guard let en = fm.enumerator(at: sessionsDir,
+                                     includingPropertiesForKeys: [.contentModificationDateKey]) else { return nil }
+        var best: (URL, Date)?
+        for case let url as URL in en where url.pathExtension == "jsonl" {
+            let d = (try? url.resourceValues(forKeys: [.contentModificationDateKey])
+                .contentModificationDate) ?? .distantPast
+            if best == nil || d > best!.1 { best = (url, d) }
+        }
+        return best?.0
+    }
 }

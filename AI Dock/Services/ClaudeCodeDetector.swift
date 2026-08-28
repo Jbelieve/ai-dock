@@ -65,4 +65,47 @@ enum ClaudeCodeDetector {
         let s = UsageMetrics.score(dates: dates, sessionCap: 40, weeklyCap: 200)
         return (s.session, s.allModels, s.sessionReset, s.allModelsReset)
     }
+
+    // MARK: - Real usage (Anthropic OAuth endpoint)
+
+    /// Live usage from Anthropic's OAuth usage endpoint — the same source that
+    /// powers `/usage` inside Claude Code. Reuses the CLI's own access token
+    /// (read-only; the CLI refreshes it itself). Returns nil on any failure
+    /// (expired token, offline) so callers can fall back to the estimate.
+    static func fetchRealUsage() async -> (session: Double, allModels: Double, sessionReset: Date?, allReset: Date?)? {
+        guard let data = try? Data(contentsOf: credentials),
+              let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let oauth = root["claudeAiOauth"] as? [String: Any],
+              let token = oauth["accessToken"] as? String, !token.isEmpty
+        else { return nil }
+
+        guard let url = URL(string: "https://api.anthropic.com/api/oauth/usage") else { return nil }
+        var req = URLRequest(url: url)
+        req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        req.setValue("oauth-2025-04-20", forHTTPHeaderField: "anthropic-beta")
+        req.timeoutInterval = 10
+
+        guard let (body, resp) = try? await URLSession.shared.data(for: req),
+              (resp as? HTTPURLResponse)?.statusCode == 200,
+              let json = try? JSONSerialization.jsonObject(with: body) as? [String: Any]
+        else { return nil }
+
+        func window(_ key: String) -> (Double, Date?)? {
+            guard let w = json[key] as? [String: Any],
+                  let pct = w["utilization"] as? Double else { return nil }
+            return (min(1, max(0, pct / 100)), isoDate(w["resets_at"] as? String))
+        }
+        guard let five = window("five_hour"), let week = window("seven_day") else { return nil }
+        return (five.0, week.0, five.1, week.1)
+    }
+
+    private static func isoDate(_ string: String?) -> Date? {
+        guard var s = string else { return nil }
+        // The endpoint sends 6-digit fractional seconds, which
+        // ISO8601DateFormatter rejects — strip the fraction.
+        if let r = s.range(of: #"\.\d+"#, options: .regularExpression) {
+            s.removeSubrange(r)
+        }
+        return ISO8601DateFormatter().date(from: s)
+    }
 }

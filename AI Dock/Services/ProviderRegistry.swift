@@ -16,17 +16,18 @@ enum ProviderRegistry {
         return found
     }
 
-    /// Build a usage snapshot for a detected provider from its local data.
-    /// Falls back to a zeroed snapshot (still shows the ring) when we can't
-    /// read anything — the UI never goes blank.
-    static func snapshot(for provider: Provider) -> UsageSnapshot {
+    /// Build a usage snapshot for a detected provider. Prefers REAL usage
+    /// (Anthropic's OAuth usage endpoint, Codex's server-reported rate_limits)
+    /// and falls back to the local-activity estimate, then to a zeroed
+    /// snapshot (still shows the ring) — the UI never goes blank.
+    static func snapshot(for provider: Provider) async -> UsageSnapshot {
         let estimate: (session: Double, allModels: Double, sessionReset: Date?, allReset: Date?)?
 
         switch provider.id {
         case "claude-code":
-            estimate = ClaudeCodeDetector.estimateUsage()
+            estimate = await ClaudeCodeDetector.fetchRealUsage() ?? ClaudeCodeDetector.estimateUsage()
         case "codex-cli":
-            estimate = CodexCLIDetector.estimateUsage()
+            estimate = CodexCLIDetector.readRealUsage() ?? CodexCLIDetector.estimateUsage()
         case "gemini":
             estimate = GeminiDetector.estimateUsage()
         default:

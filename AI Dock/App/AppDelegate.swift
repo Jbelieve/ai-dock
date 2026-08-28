@@ -63,17 +63,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.statusItem = item
     }
 
-    @objc private func openSettings() {
+    @objc func openSettings() {
         // Opens the SwiftUI Settings scene defined in AIDockApp.
         NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
         NSApp.activate(ignoringOtherApps: true)
     }
 
-    @objc private func refreshUsage() {
+    @objc func refreshUsage() {
         Task { await usageStore.refresh() }
     }
 
-    @objc private func quit() { NSApp.terminate(nil) }
+    @objc func quit() { NSApp.terminate(nil) }
 
     // MARK: - Usage tracking
 
