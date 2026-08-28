@@ -1,0 +1,21 @@
+"AI Dock/Services/ProviderRegistry.swift"
+  s_909970ebfbc426::t_4887834a8b65d9 28-30,32
+"AI Dock/Services/ClaudeCodeDetector.swift"
+  s_909970ebfbc426::t_1e9a8e90663117 60-72,75-86,90-95,103-107,109,114-165
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "02503e91f73df2d8226c93547801c9607277eae6",
+  "prompts": {},
+  "sessions": {
+    "s_909970ebfbc426": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "80870049-304a-45f4-b201-1053d224a457",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Jbelieve <jorge@believe-global.com>"
+    }
+  }
+}
