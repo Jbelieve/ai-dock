@@ -53,15 +53,6 @@ enum CodexCLIDetector {
         )
     }
 
-    static func estimateUsage() -> (session: Double, allModels: Double, sessionReset: Date?, allReset: Date?)? {
-        let fm = FileManager.default
-        guard fm.fileExists(atPath: sessionsDir.path) else { return nil }
-        let dates = UsageMetrics.modificationDates(under: sessionsDir, suffix: ".jsonl")
-        guard !dates.isEmpty else { return nil }
-        let s = UsageMetrics.score(dates: dates, sessionCap: 30, weeklyCap: 150)
-        return (s.session, s.allModels, s.sessionReset, s.allModelsReset)
-    }
-
     // MARK: - Real usage (rate_limits cached in session rollouts)
 
     /// Real usage percentages from OpenAI's servers: the Codex CLI persists

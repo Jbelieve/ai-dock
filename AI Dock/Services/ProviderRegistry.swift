@@ -25,9 +25,11 @@ enum ProviderRegistry {
 
         switch provider.id {
         case "claude-code":
-            estimate = await ClaudeCodeDetector.fetchRealUsage() ?? ClaudeCodeDetector.estimateUsage()
+            // Real data only — a failed fetch serves the last good reading,
+            // never the old local-activity estimate (it invented 100%s).
+            estimate = await ClaudeCodeDetector.fetchRealUsage()
         case "codex-cli":
-            estimate = CodexCLIDetector.readRealUsage() ?? CodexCLIDetector.estimateUsage()
+            estimate = CodexCLIDetector.readRealUsage()
         case "gemini":
             estimate = GeminiDetector.estimateUsage()
         default:
