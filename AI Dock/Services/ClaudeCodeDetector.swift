@@ -74,15 +74,18 @@ enum ClaudeCodeDetector {
     /// powers `/usage` inside Claude Code. Reuses the CLI's own access token
     /// (read-only; the CLI refreshes it itself).
     ///
-    /// Rate-limit friendly: at most one network hit per 60s; a failure (429,
-    /// expired token, offline) backs off for minutes and serves the last good
-    /// reading instead. NEVER invents numbers — if there's no real reading
-    /// yet, returns nil and the ring shows 0.
+    /// Rate-limit friendly: the endpoint bans the whole account for ~1h if
+    /// polled too hard (observed: ~2/min sustained tripped it), so normal
+    /// polling is capped at one hit per 3 min and a manual Refresh at one per
+    /// 30s. A failure (429, expired token, offline) backs off per Retry-After
+    /// and serves the last good reading instead. NEVER invents numbers — if
+    /// there's no real reading yet, returns nil and the ring shows "—".
     @MainActor
-    static func fetchRealUsage() async -> Usage? {
+    static func fetchRealUsage(force: Bool = false) async -> Usage? {
         let now = Date()
         if cached == nil { cached = loadPersisted() }
-        if let c = cached, now.timeIntervalSince(c.fetchedAt) < 60 { return clamped(c) }
+        let ttl: TimeInterval = force ? 30 : 180
+        if let c = cached, now.timeIntervalSince(c.fetchedAt) < ttl { return clamped(c) }
         if now < backoffUntil { return cached.map(clamped) }
 
         guard let data = try? Data(contentsOf: credentials),

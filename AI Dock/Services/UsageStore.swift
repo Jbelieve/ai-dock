@@ -33,14 +33,14 @@ final class UsageStore {
 
     /// Re-scan local data. Shows exactly the detected+enabled providers, in a
     /// stable order so rings don't jump around each tick.
-    func refresh() async {
+    func refresh(force: Bool = false) async {
         let detected = ProviderRegistry.detectAll()
         self.detectedProviders = detected
 
         let visible = detected.filter { settings.isEnabled($0.id) }
         var fresh: [UsageSnapshot] = []
         for provider in visible {
-            fresh.append(await ProviderRegistry.snapshot(for: provider))
+            fresh.append(await ProviderRegistry.snapshot(for: provider, force: force))
         }
 
         // Stable merge: keep existing slots, append new, drop gone.

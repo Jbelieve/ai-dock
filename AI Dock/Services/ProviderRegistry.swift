@@ -20,14 +20,14 @@ enum ProviderRegistry {
     /// (Anthropic's OAuth usage endpoint, Codex's server-reported rate_limits)
     /// and falls back to the local-activity estimate, then to a zeroed
     /// snapshot (still shows the ring) — the UI never goes blank.
-    static func snapshot(for provider: Provider) async -> UsageSnapshot {
+    static func snapshot(for provider: Provider, force: Bool = false) async -> UsageSnapshot {
         let estimate: (session: Double, allModels: Double, sessionReset: Date?, allReset: Date?)?
 
         switch provider.id {
         case "claude-code":
             // Real data only — a failed fetch serves the last good reading,
             // never the old local-activity estimate (it invented 100%s).
-            estimate = await ClaudeCodeDetector.fetchRealUsage()
+            estimate = await ClaudeCodeDetector.fetchRealUsage(force: force)
         case "codex-cli":
             estimate = CodexCLIDetector.readRealUsage()
         case "gemini":

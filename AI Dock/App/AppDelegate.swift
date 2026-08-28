@@ -81,7 +81,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func refreshUsage() {
-        Task { await usageStore.refresh() }
+        // Manual refresh = the user wants it NOW: bypass the polling cache
+        // (still respects the endpoint's Retry-After ban if one is active).
+        Task { await usageStore.refresh(force: true) }
     }
 
     @objc func quit() { NSApp.terminate(nil) }
