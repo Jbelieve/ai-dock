@@ -1,0 +1,19 @@
+"AI Dock/Views/NotchView.swift"
+  s_909970ebfbc426::t_ca850d2a259587 127-131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "0c52d61bcd0a3ec3bd642610b89948b4b07c870b",
+  "prompts": {},
+  "sessions": {
+    "s_909970ebfbc426": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "80870049-304a-45f4-b201-1053d224a457",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Jbelieve <jorge@believe-global.com>"
+    }
+  }
+}
