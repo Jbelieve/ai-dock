@@ -38,10 +38,36 @@ enum ClaudeTokenRefresher {
         let expiresAt: Date?
     }
 
+    /// The `claudeAiOauth` object, from whichever store holds the fresher one.
+    /// On macOS the CLI keeps it in the Keychain and the file may be missing or
+    /// stale; elsewhere only the file exists.
+    static func oauth() -> [String: Any]? {
+        let candidates = [try? Data(contentsOf: credentialsFile), keychainData()]
+            .compactMap { $0 }
+            .compactMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] }
+            .compactMap { $0["claudeAiOauth"] as? [String: Any] }
+        return candidates.max {
+            ($0["expiresAt"] as? Double ?? 0) < ($1["expiresAt"] as? Double ?? 0)
+        }
+    }
+
+    /// Read through `/usr/bin/security`: the CLI creates the item with that tool,
+    /// so it is already on the item's access list and no Keychain prompt appears.
+    private static func keychainData() -> Data? {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/security")
+        process.arguments = ["find-generic-password", "-s", "Claude Code-credentials", "-w"]
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = FileHandle.nullDevice
+        guard (try? process.run()) != nil else { return nil }
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        process.waitUntilExit()
+        return process.terminationStatus == 0 ? data : nil
+    }
+
     static func credential() -> Credential? {
-        guard let data = try? Data(contentsOf: credentialsFile),
-              let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let oauth = root["claudeAiOauth"] as? [String: Any],
+        guard let oauth = oauth(),
               let token = oauth["accessToken"] as? String, !token.isEmpty
         else { return nil }
         // `expiresAt` is milliseconds since the epoch.
