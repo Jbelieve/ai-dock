@@ -28,7 +28,7 @@ jobs:
   build:
     runs-on: [self-hosted, macOS, ARM64]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # En self-hosted el workspace persiste entre releases: sin esto, un
       # artefacto viejo se adjuntaría al release equivocado.
