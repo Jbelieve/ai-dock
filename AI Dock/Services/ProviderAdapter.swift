@@ -56,7 +56,7 @@ enum ProviderCatalog {
         detect: { ClaudeCodeDetector.detect()?.source },
         read: { force in
             var reading = await ClaudeCodeDetector.fetchRealUsage(force: force)
-            reading?.stats = ClaudeCodeDetector.localStats()
+            reading?.stats = await ClaudeCodeDetector.localStats()
             return reading
         }
     )

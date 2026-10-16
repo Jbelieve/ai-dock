@@ -333,6 +333,16 @@ struct UsagePopoverView: View {
                     .frame(height: 36)
                     .padding(.top, 2)
                 }
+
+                ForEach(stats.groups) { group in
+                    glassDivider
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(group.title)
+                            .font(.system(size: 10.5, weight: .medium))
+                            .foregroundStyle(Dock.Ink.tertiary)
+                        ForEach(group.rows) { row in statLine(row.label, row.value) }
+                    }
+                }
             }
             .padding(12)
             .dockGlassCard(cornerRadius: 14)
