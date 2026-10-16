@@ -141,6 +141,7 @@ enum ClaudeCodeDetector {
             return cached.map(clamped)
         }
 
+        surfaces = parseBreakdown(json["seven_day_breakdown"])
         let windows = parseLimits(json["limits"])
         let credits = parseExtraUsage(json["extra_usage"])
         let tier = ClaudeTokenRefresher.oauth()?["rateLimitTier"] as? String
@@ -194,6 +195,20 @@ enum ClaudeCodeDetector {
         default:
             if let scope { return "\(scope) · \(kind.replacingOccurrences(of: "_", with: " "))" }
             return kind.replacingOccurrences(of: "_", with: " ").capitalized
+        }
+    }
+
+    /// Where the weekly allowance went across the whole account (Claude Code,
+    /// chats, Cowork…), as Anthropic reports it.
+    /// ponytail: in memory only, so it shows after the first fetch of a launch.
+    @MainActor private static var surfaces: [StatRow] = []
+
+    private static func parseBreakdown(_ raw: Any?) -> [StatRow] {
+        let rows = (raw as? [String: Any])?["rows"] as? [[String: Any]] ?? []
+        return rows.compactMap { r in
+            guard let name = r["display_name"] as? String,
+                  let pct = r["percent"] as? Double, pct > 0 else { return nil }
+            return StatRow(id: "surface:\(name)", label: name, value: "\(Int(pct.rounded()))%")
         }
     }
 
@@ -295,6 +310,7 @@ enum ClaudeCodeDetector {
     /// The hover card's statistics, built from the transcripts the cost index
     /// already holds — the same rows Codex and Gemini show. Local only: usage
     /// from other Macs or claude.ai is not in these files.
+    @MainActor
     static func localStats(now: Date = Date()) -> UsageStats? {
         guard let db = try? CostDatabase() else { return nil }
         let events = db.events(since: nil).filter { $0.model.hasPrefix("claude") }
@@ -329,7 +345,35 @@ enum ClaudeCodeDetector {
             seriesLabel: "30-day tokens · this Mac",
             seriesValue: fmt(series.reduce(0, +)),
             todayLabel: "Today",
-            todayValue: fmt(days[today] ?? 0))
+            todayValue: fmt(days[today] ?? 0),
+            groups: [
+                StatGroup(id: "surfaces", title: "This week · whole account", rows: surfaces),
+                StatGroup(id: "projects", title: "This week · by project",
+                          rows: projectShare(db.attributed(since: now.addingTimeInterval(-7 * 86_400))))
+            ].filter { !$0.rows.isEmpty })
+    }
+
+    /// The share of the weekly limit each project consumed, from the cost
+    /// index's attribution. Usage from other Macs or claude.ai has no project
+    /// here and lands under "Elsewhere".
+    private static func projectShare(_ rows: [AttributionRow]) -> [StatRow] {
+        var share: [String: Double] = [:]
+        for r in rows where r.window == "claude-code:weekly_all" {
+            share[r.project, default: 0] += r.deltaPct
+        }
+        let named = share.filter { $0.key != AttributionRow.unexplained && $0.value > 0 }
+            .sorted { $0.value > $1.value }.prefix(3)
+        var out = named.map { StatRow(id: "project:\($0.key)",
+                                      label: URL(fileURLWithPath: $0.key).lastPathComponent,
+                                      value: pct($0.value)) }
+        if let other = share[AttributionRow.unexplained], other > 0 {
+            out.append(StatRow(id: "project:elsewhere", label: "Elsewhere", value: pct(other)))
+        }
+        return out
+    }
+
+    private static func pct(_ v: Double) -> String {
+        v < 10 ? String(format: "%.1f%%", v) : "\(Int(v.rounded()))%"
     }
 
     private static func duration(_ t: TimeInterval) -> String {

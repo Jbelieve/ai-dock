@@ -66,6 +66,14 @@ struct UsageStats: Hashable {
     var todayValue: String?
     /// A footnote under a sub-block, e.g. "Next expires Oct 22".
     var note: String?
+    /// Extra titled lists under the chart, e.g. where the week went.
+    var groups: [StatGroup] = []
 
-    var isEmpty: Bool { rows.isEmpty && dailyTokens.isEmpty }
+    var isEmpty: Bool { rows.isEmpty && dailyTokens.isEmpty && groups.isEmpty }
+}
+
+struct StatGroup: Hashable, Identifiable {
+    let id: String
+    let title: String
+    let rows: [StatRow]
 }
