@@ -143,9 +143,7 @@ enum ClaudeCodeDetector {
 
         let windows = parseLimits(json["limits"])
         let credits = parseExtraUsage(json["extra_usage"])
-        let tier = (try? Data(contentsOf: credentials))
-            .flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] }?
-            .flatMap { ($0["claudeAiOauth"] as? [String: Any])?["rateLimitTier"] as? String }
+        let tier = ClaudeTokenRefresher.oauth()?["rateLimitTier"] as? String
 
         let fresh = CachedUsage(
             session: five?.0 ?? 0, allModels: week?.0 ?? 0,
