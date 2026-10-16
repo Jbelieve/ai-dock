@@ -29,12 +29,30 @@ enum PreviewExporter {
         let store = UsageStore(settings: settings)
         store.seedFixedMock()
 
-        let view = SettingsView(settings: settings, store: store)
+        // Seed the Costs card with fixed rows so the render is deterministic —
+        // an offline preview must not depend on what is on disk today.
+        let costs = CostCenter()
+        costs.seedPreview()
+
+        let view = SettingsView(settings: settings, store: store, costCenter: costs)
         write(view: view, to: outputPath)
     }
 
     static func run(outputPath: String) {
+        let savedHeadline = UserDefaults.standard.string(forKey: DockSettings.Keys.headlineWindow)
+        let savedRemaining = UserDefaults.standard.object(forKey: DockSettings.Keys.showRemaining)
+        defer {
+            if let savedHeadline {
+                UserDefaults.standard.set(savedHeadline, forKey: DockSettings.Keys.headlineWindow)
+            }
+            if let savedRemaining {
+                UserDefaults.standard.set(savedRemaining, forKey: DockSettings.Keys.showRemaining)
+            }
+        }
+
         let settings = DockSettings()
+        settings.headlineWindow = .session
+        settings.showRemaining = false
         let store = UsageStore(settings: settings)
         store.seedFixedMock()   // 73 / 21 / 52 — identical to the reference images
 
@@ -44,9 +62,23 @@ enum PreviewExporter {
                                                  scale: settings.scale))
             .padding(50)
             .background(
-                LinearGradient(colors: [Color(red: 0.30, green: 0.62, blue: 0.78),
-                                        Color(red: 0.12, green: 0.28, blue: 0.42)],
-                               startPoint: .topLeading, endPoint: .bottomTrailing)
+                ZStack {
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.14, green: 0.34, blue: 0.48),
+                            Color(red: 0.08, green: 0.18, blue: 0.30),
+                            Color(red: 0.05, green: 0.10, blue: 0.18)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    RadialGradient(
+                        colors: [Color(red: 0.28, green: 0.62, blue: 0.82).opacity(0.35), .clear],
+                        center: .topLeading,
+                        startRadius: 20,
+                        endRadius: 520
+                    )
+                }
             )
 
         write(view: view, to: outputPath)

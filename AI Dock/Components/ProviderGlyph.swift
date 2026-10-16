@@ -24,12 +24,5 @@ struct ProviderGlyph: View {
         .frame(width: size, height: size)
     }
 
-    private var assetName: String? {
-        switch kind {
-        case .claudeSpark: "BrandClaude"
-        case .openAIKnot: "BrandOpenAI"
-        case .geminiStar: "BrandGemini"
-        case .genericBurst: nil
-        }
-    }
+    private var assetName: String? { kind.assetName }
 }

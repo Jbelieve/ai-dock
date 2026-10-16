@@ -53,13 +53,26 @@ enum CodexCLIDetector {
         )
     }
 
-    // MARK: - Real usage (rate_limits cached in session rollouts)
+    // MARK: - Real usage
 
-    /// Real usage percentages from OpenAI's servers: the Codex CLI persists
+    /// Prefer OpenAI's own backend, then fall back to the `rate_limits` blob the
+    /// CLI caches in its newest session rollout.
+    ///
+    /// The order matters and is the whole point of the port: the cached blob is
+    /// only as fresh as the last turn the user ran, so a ring built on it alone
+    /// reports 0% all morning. Codenotch hit exactly this and moved to the live
+    /// endpoint. The cache is still the fallback because it works offline and
+    /// for accounts the backend will not answer for.
+    static func fetchRealUsage() async -> UsageReading? {
+        if let live = await CodexLiveUsage.fetch() { return live }
+        return readCachedRateLimits()
+    }
+
+    /// Usage percentages as the Codex CLI last recorded them: it persists
     /// `rate_limits` (primary = 5h window, secondary = weekly) with every
     /// token-count event in its session JSONLs. We read the last one from the
     /// newest session. A window whose reset time already passed reads as 0%.
-    static func readRealUsage() -> (session: Double, allModels: Double, sessionReset: Date?, allReset: Date?)? {
+    static func readCachedRateLimits() -> UsageReading? {
         guard let newest = newestSessionFile(),
               let handle = try? FileHandle(forReadingFrom: newest) else { return nil }
         defer { try? handle.close() }
@@ -78,18 +91,37 @@ enum CodexCLIDetector {
         }
         guard let rl = latest else { return nil }
 
-        func window(_ key: String) -> (Double, Date?)? {
+        func window(_ key: String, kind: String, label: String) -> UsageWindow? {
             guard let w = rl[key] as? [String: Any],
                   let pct = w["used_percent"] as? Double else { return nil }
             let reset = (w["resets_at"] as? Double).map { Date(timeIntervalSince1970: $0) }
             // Cached value from an old session: if the window already reset,
             // the real current usage is 0.
-            if let reset, reset < Date() { return (0, nil) }
-            return (min(1, max(0, pct / 100)), reset)
+            let expired = reset.map { $0 < Date() } ?? false
+            let fraction = expired ? 0 : min(1, max(0, pct / 100))
+            return UsageWindow(id: kind, kind: kind, label: label,
+                               usedFraction: fraction,
+                               resetsAt: expired ? nil : reset,
+                               severity: .classify(fraction, watch: 0.8, critical: 1.0),
+                               scope: nil)
         }
-        guard let primary = window("primary") else { return nil }
-        let secondary = window("secondary")
-        return (primary.0, secondary?.0 ?? 0, primary.1, secondary?.1)
+
+        var windows: [UsageWindow] = []
+        if let w = window("primary", kind: "session", label: "Current session") { windows.append(w) }
+        if let w = window("secondary", kind: "weekly", label: "All models") { windows.append(w) }
+        guard let primary = windows.first(where: { $0.kind == "session" }) ?? windows.first else {
+            return nil
+        }
+        let secondary = windows.first { $0.kind == "weekly" }
+        return UsageReading(
+            session: primary.usedFraction,
+            allModels: secondary?.usedFraction ?? 0,
+            sessionReset: primary.resetsAt,
+            allReset: secondary?.resetsAt,
+            windows: windows,
+            plan: nil,
+            credits: nil,
+            isLive: false)
     }
 
     /// Recursively locate a dict that looks like a rate_limits payload

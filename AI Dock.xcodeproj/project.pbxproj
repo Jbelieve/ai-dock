@@ -34,6 +34,23 @@
 		A10000000000000000000074 /* PopoverBubbleShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000074 /* PopoverBubbleShape.swift */; };
 		A10000000000000000000062 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000062 /* SettingsView.swift */; };
 		A10000000000000000000080 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000080 /* Assets.xcassets */; };
+		A10000000000000000000042 /* UsageWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000042 /* UsageWindow.swift */; };
+		A10000000000000000000043 /* UsageReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000043 /* UsageReading.swift */; };
+		A10000000000000000000058 /* CodexLiveUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000058 /* CodexLiveUsage.swift */; };
+		A10000000000000000000059 /* ClaudeTokenRefresher.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000059 /* ClaudeTokenRefresher.swift */; };
+		A10000000000000000000013 /* UsageDump.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000013 /* UsageDump.swift */; };
+		A10000000000000000000044 /* CostModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000044 /* CostModels.swift */; };
+		A1000000000000000000005A /* PriceCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000005A /* PriceCatalog.swift */; };
+		A1000000000000000000005B /* CostDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000005B /* CostDatabase.swift */; };
+		A1000000000000000000005C /* CostIndexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000005C /* CostIndexer.swift */; };
+		A1000000000000000000005D /* CostCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000005D /* CostCenter.swift */; };
+		A10000000000000000000063 /* CostsCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000063 /* CostsCard.swift */; };
+		A1000000000000000000005E /* LimitNotifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000005E /* LimitNotifier.swift */; };
+		A1000000000000000000005F /* ProviderCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000005F /* ProviderCredentials.swift */; };
+		A10000000000000000000090 /* OpenRouterDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000090 /* OpenRouterDetector.swift */; };
+		A10000000000000000000091 /* DeepSeekDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000091 /* DeepSeekDetector.swift */; };
+		A10000000000000000000092 /* ProviderAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000092 /* ProviderAdapter.swift */; };
+		A10000000000000000000093 /* ZaiDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000093 /* ZaiDetector.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -67,6 +84,23 @@
 		A20000000000000000000080 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A20000000000000000000081 /* AIDock.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AIDock.entitlements; sourceTree = "<group>"; };
 		A20000000000000000000082 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A20000000000000000000042 /* UsageWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageWindow.swift; sourceTree = "<group>"; };
+		A20000000000000000000043 /* UsageReading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageReading.swift; sourceTree = "<group>"; };
+		A20000000000000000000058 /* CodexLiveUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexLiveUsage.swift; sourceTree = "<group>"; };
+		A20000000000000000000059 /* ClaudeTokenRefresher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeTokenRefresher.swift; sourceTree = "<group>"; };
+		A20000000000000000000013 /* UsageDump.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageDump.swift; sourceTree = "<group>"; };
+		A20000000000000000000044 /* CostModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostModels.swift; sourceTree = "<group>"; };
+		A2000000000000000000005A /* PriceCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceCatalog.swift; sourceTree = "<group>"; };
+		A2000000000000000000005B /* CostDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostDatabase.swift; sourceTree = "<group>"; };
+		A2000000000000000000005C /* CostIndexer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostIndexer.swift; sourceTree = "<group>"; };
+		A2000000000000000000005D /* CostCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostCenter.swift; sourceTree = "<group>"; };
+		A20000000000000000000063 /* CostsCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostsCard.swift; sourceTree = "<group>"; };
+		A2000000000000000000005E /* LimitNotifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LimitNotifier.swift; sourceTree = "<group>"; };
+		A2000000000000000000005F /* ProviderCredentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderCredentials.swift; sourceTree = "<group>"; };
+		A20000000000000000000090 /* OpenRouterDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterDetector.swift; sourceTree = "<group>"; };
+		A20000000000000000000091 /* DeepSeekDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeekDetector.swift; sourceTree = "<group>"; };
+		A20000000000000000000092 /* ProviderAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderAdapter.swift; sourceTree = "<group>"; };
+		A20000000000000000000093 /* ZaiDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZaiDetector.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,6 +151,7 @@
 				A20000000000000000000010 /* AIDockApp.swift */,
 				A20000000000000000000011 /* AppDelegate.swift */,
 				A20000000000000000000012 /* PreviewExporter.swift */,
+				A20000000000000000000013 /* UsageDump.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -144,6 +179,9 @@
 			children = (
 				A20000000000000000000040 /* Provider.swift */,
 				A20000000000000000000041 /* UsageSnapshot.swift */,
+				A20000000000000000000043 /* UsageReading.swift */,
+				A20000000000000000000042 /* UsageWindow.swift */,
+				A20000000000000000000044 /* CostModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -159,6 +197,18 @@
 				A20000000000000000000055 /* GeminiDetector.swift */,
 				A20000000000000000000056 /* EnvKeys.swift */,
 				A20000000000000000000057 /* UsageMetrics.swift */,
+				A20000000000000000000059 /* ClaudeTokenRefresher.swift */,
+				A20000000000000000000058 /* CodexLiveUsage.swift */,
+				A2000000000000000000005A /* PriceCatalog.swift */,
+				A2000000000000000000005B /* CostDatabase.swift */,
+				A2000000000000000000005C /* CostIndexer.swift */,
+				A2000000000000000000005D /* CostCenter.swift */,
+				A2000000000000000000005E /* LimitNotifier.swift */,
+				A2000000000000000000005F /* ProviderCredentials.swift */,
+				A20000000000000000000090 /* OpenRouterDetector.swift */,
+				A20000000000000000000091 /* DeepSeekDetector.swift */,
+				A20000000000000000000092 /* ProviderAdapter.swift */,
+				A20000000000000000000093 /* ZaiDetector.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -169,6 +219,7 @@
 				A20000000000000000000060 /* NotchView.swift */,
 				A20000000000000000000061 /* UsagePopoverView.swift */,
 				A20000000000000000000062 /* SettingsView.swift */,
+				A20000000000000000000063 /* CostsCard.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -286,6 +337,23 @@
 				A10000000000000000000073 /* EdgeTabShape.swift in Sources */,
 				A10000000000000000000074 /* PopoverBubbleShape.swift in Sources */,
 				A10000000000000000000062 /* SettingsView.swift in Sources */,
+				A10000000000000000000093 /* ZaiDetector.swift in Sources */,
+				A10000000000000000000092 /* ProviderAdapter.swift in Sources */,
+				A10000000000000000000091 /* DeepSeekDetector.swift in Sources */,
+				A10000000000000000000090 /* OpenRouterDetector.swift in Sources */,
+				A1000000000000000000005F /* ProviderCredentials.swift in Sources */,
+				A1000000000000000000005E /* LimitNotifier.swift in Sources */,
+				A10000000000000000000063 /* CostsCard.swift in Sources */,
+				A1000000000000000000005D /* CostCenter.swift in Sources */,
+				A1000000000000000000005C /* CostIndexer.swift in Sources */,
+				A1000000000000000000005B /* CostDatabase.swift in Sources */,
+				A1000000000000000000005A /* PriceCatalog.swift in Sources */,
+				A10000000000000000000044 /* CostModels.swift in Sources */,
+				A10000000000000000000013 /* UsageDump.swift in Sources */,
+				A10000000000000000000059 /* ClaudeTokenRefresher.swift in Sources */,
+				A10000000000000000000058 /* CodexLiveUsage.swift in Sources */,
+				A10000000000000000000043 /* UsageReading.swift in Sources */,
+				A10000000000000000000042 /* UsageWindow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -360,7 +428,7 @@
 				CODE_SIGN_ENTITLEMENTS = "AI Dock/Resources/AIDock.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -374,7 +442,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aidock.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -391,7 +459,7 @@
 				CODE_SIGN_ENTITLEMENTS = "AI Dock/Resources/AIDock.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -405,7 +473,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aidock.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;

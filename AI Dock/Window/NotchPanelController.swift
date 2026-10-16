@@ -17,7 +17,7 @@ final class NotchPanelController {
     private var suppressNextApply = false
 
     /// Panel width = tab + popover room. Height tracks the number of rings.
-    private var panelWidth: CGFloat { NotchView.tabWidth(scale: settings.scale) + 340 }
+    private var panelWidth: CGFloat { NotchView.tabWidth(scale: settings.scale) + 330 }
     private var panelHeight: CGFloat {
         NotchView.panelHeight(forCount: max(1, usageStore.snapshots.count),
                               scale: settings.scale)
@@ -27,8 +27,8 @@ final class NotchPanelController {
         self.usageStore = usageStore
         self.settings = settings
 
-        let size = NSSize(width: NotchView.tabWidth(scale: settings.scale) + 340,
-                          height: 320)
+        let size = NSSize(width: NotchView.tabWidth(scale: settings.scale) + 330,
+                          height: NotchView.panelHeight(forCount: 1, scale: settings.scale))
         let panel = DraggableNotchPanel(
             contentRect: NSRect(origin: .zero, size: size),
             styleMask: [.borderless, .nonactivatingPanel],

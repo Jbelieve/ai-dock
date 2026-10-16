@@ -7,6 +7,8 @@ import SwiftUI
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let settings = DockSettings()
     private(set) lazy var usageStore = UsageStore(settings: settings)
+    /// Transcript cost index — ported from Codenotch's Costs section.
+    let costCenter = CostCenter()
 
     private var notchPanel: NotchPanelController?
     private var statusItem: NSStatusItem?
@@ -14,6 +16,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var settingsWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Headless verification: print what the notch would show, then quit.
+        if UsageDump.requested(in: CommandLine.arguments) {
+            Task { await UsageDump.run() }
+            return
+        }
         // Offline preview export: render the notch to PNG and quit. Used to
         // visually verify the UI without screen-recording permissions.
         if let path = PreviewExporter.outputPath(from: CommandLine.arguments) {
@@ -64,7 +71,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // removed in macOS 15, so an accessory app must host settings itself.
         if settingsWindow == nil {
             let hosting = NSHostingController(
-                rootView: SettingsView(settings: settings, store: usageStore))
+                rootView: SettingsView(settings: settings, store: usageStore,
+                                       costCenter: costCenter))
             let window = NSWindow(contentViewController: hosting)
             window.styleMask = [.titled, .closable, .fullSizeContentView]
             window.titlebarAppearsTransparent = true
@@ -90,15 +98,36 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Usage tracking
 
+    private var activityTask: Task<Void, Never>?
+
     private func startUsageTracking() {
         refreshTask?.cancel()
+        activityTask?.cancel()
+        // Cost indexing runs on its own, slower cadence: a pass is cheap
+        // (cursors) but pointless every 15 seconds.
+        costCenter.start(interval: 120)
+
         refreshTask = Task { [weak self] in
             guard let self else { return }
             await self.usageStore.bootstrap()
+            await self.costCenter.observe(snapshots: self.usageStore.snapshots)
             while !Task.isCancelled {
                 let interval = self.settings.refreshInterval
                 try? await Task.sleep(for: .seconds(interval))
                 await self.usageStore.refresh()
+                // Sample quota on every refresh so a movement can later be
+                // attributed to whichever project caused it.
+                await self.costCenter.observe(snapshots: self.usageStore.snapshots)
+            }
+        }
+
+        // Fast local pulse (3s) so the inner orbital activity arc starts and
+        // stops within seconds of an agent session writing transcripts.
+        activityTask = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(3))
+                guard let self else { return }
+                self.usageStore.pollActivity()
             }
         }
     }

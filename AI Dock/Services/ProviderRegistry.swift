@@ -1,51 +1,58 @@
 import Foundation
 
-/// Discovers which AI providers are installed/signed-in on this machine and
-/// produces their latest usage snapshots. Pure-local: scans CLIs, config dirs
-/// and credential files — never hits the network.
+/// Discovers which AI providers are present on this machine and produces their
+/// latest usage snapshots.
 ///
-/// Adding a new provider = write a `…Detector` enum and register it here.
+/// Providers are now described as data in `ProviderCatalog` (the pattern ported
+/// from Codenotch, whose `AppDelegate` holds a list of 32 `UsageProvider`
+/// conformers). Adding one is a single entry there — no switch to keep in sync.
+///
+/// The distinction between **authoritative** and **estimated** readings is kept
+/// honest all the way to the UI: authoritative numbers come from the provider
+/// itself (its own server, or a credential/file the provider wrote), estimated
+/// numbers are derived from local file activity.
+@MainActor
 enum ProviderRegistry {
 
-    /// Run every detector and return the providers found, in display order.
+    /// Run every adapter's detector and return the providers found, in catalog
+    /// order so rings never jump around between refreshes.
     static func detectAll() -> [Provider] {
-        var found: [Provider] = []
-        if let p = ClaudeCodeDetector.detect() { found.append(p) }
-        if let p = CodexCLIDetector.detect() { found.append(p) }
-        if let p = GeminiDetector.detect() { found.append(p) }
-        return found
+        ProviderCatalog.all.compactMap { adapter in
+            guard let source = adapter.detect() else { return nil }
+            return Provider(id: adapter.id,
+                            displayName: adapter.displayName,
+                            glyph: adapter.glyph,
+                            accent: adapter.accent,
+                            source: source)
+        }
     }
 
-    /// Build a usage snapshot for a detected provider. Prefers REAL usage
-    /// (Anthropic's OAuth usage endpoint, Codex's server-reported rate_limits)
-    /// and falls back to the local-activity estimate, then to a zeroed
-    /// snapshot (still shows the ring) — the UI never goes blank.
+    /// Build a usage snapshot for a detected provider.
+    ///
+    /// Real data wins; when a provider cannot be read, the snapshot carries no
+    /// data and the ring shows "—" rather than a misleading 0%.
     static func snapshot(for provider: Provider, force: Bool = false) async -> UsageSnapshot {
-        let estimate: (session: Double, allModels: Double, sessionReset: Date?, allReset: Date?)?
-
-        switch provider.id {
-        case "claude-code":
-            // Real data only — a failed fetch serves the last good reading,
-            // never the old local-activity estimate (it invented 100%s).
-            estimate = await ClaudeCodeDetector.fetchRealUsage(force: force)
-        case "codex-cli":
-            estimate = CodexCLIDetector.readRealUsage()
-        case "gemini":
-            estimate = GeminiDetector.estimateUsage()
-        default:
-            estimate = nil
-        }
+        let adapter = ProviderCatalog.all.first { $0.id == provider.id }
+        let reading = await adapter?.read(force)
 
         let now = Date()
         return UsageSnapshot(
             id: provider.id,
             provider: provider,
-            sessionUsedFraction: estimate?.session ?? 0,
-            sessionResetsAt: estimate?.sessionReset,
-            allModelsUsedFraction: estimate?.allModels ?? 0,
-            allModelsResetsAt: estimate?.allReset,
+            sessionUsedFraction: reading?.session ?? 0,
+            sessionResetsAt: reading?.sessionReset,
+            allModelsUsedFraction: reading?.allModels ?? 0,
+            allModelsResetsAt: reading?.allReset,
             capturedAt: now,
-            hasData: estimate != nil
+            hasData: reading != nil,
+            windows: reading?.windows ?? [],
+            plan: reading?.plan,
+            credits: reading?.credits,
+            isLive: reading?.isLive ?? false,
+            isAuthoritative: reading?.isAuthoritative ?? false,
+            balanceOnly: reading?.balanceOnly ?? false,
+            balanceDetail: reading?.balanceDetail,
+            stats: reading?.stats
         )
     }
 }
