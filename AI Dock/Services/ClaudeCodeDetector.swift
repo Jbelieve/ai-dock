@@ -289,4 +289,51 @@ enum ClaudeCodeDetector {
         }
         return ISO8601DateFormatter().date(from: s)
     }
+
+    // MARK: - Local stats (this Mac's transcripts)
+
+    /// The hover card's statistics, built from the transcripts the cost index
+    /// already holds — the same rows Codex and Gemini show. Local only: usage
+    /// from other Macs or claude.ai is not in these files.
+    static func localStats(now: Date = Date()) -> UsageStats? {
+        guard let db = try? CostDatabase() else { return nil }
+        let events = db.events(since: nil).filter { $0.model.hasPrefix("claude") }
+        guard !events.isEmpty else { return nil }
+
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: now)
+        var days: [Date: Int] = [:]
+        var spans: [String: (Date, Date)] = [:]
+        for e in events {
+            days[cal.startOfDay(for: e.ts), default: 0] += e.input + e.output + e.cacheRead + e.cacheWrite
+            let s = spans[e.sessionID]
+            spans[e.sessionID] = (min(s?.0 ?? e.ts, e.ts), max(s?.1 ?? e.ts, e.ts))
+        }
+
+        let series: [Int] = (0..<30).reversed().map {
+            days[cal.date(byAdding: .day, value: -$0, to: today) ?? today] ?? 0
+        }
+        let longest = spans.values.map { $0.1.timeIntervalSince($0.0) }.max() ?? 0
+        let (current, best) = GeminiDetector.computeStreaks(dayBuckets: days, today: today, calendar: cal)
+        let fmt = GeminiDetector.formatCompactTokens
+
+        return UsageStats(
+            rows: [
+                StatRow(id: "lifetime", label: "Lifetime tokens", value: fmt(days.values.reduce(0, +))),
+                StatRow(id: "peak", label: "Peak tokens", value: fmt(days.values.max() ?? 0)),
+                StatRow(id: "longest", label: "Longest chat", value: duration(longest)),
+                StatRow(id: "streak", label: "Current streak", value: "\(current)d"),
+                StatRow(id: "best", label: "Longest streak", value: "\(best)d")
+            ],
+            dailyTokens: series.map(Double.init),
+            seriesLabel: "30-day tokens · this Mac",
+            seriesValue: fmt(series.reduce(0, +)),
+            todayLabel: "Today",
+            todayValue: fmt(days[today] ?? 0))
+    }
+
+    private static func duration(_ t: TimeInterval) -> String {
+        let m = Int(t / 60)
+        return m >= 60 ? "\(m / 60)h \(m % 60)m" : "\(m)m"
+    }
 }
