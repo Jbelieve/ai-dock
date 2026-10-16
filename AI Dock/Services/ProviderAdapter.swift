@@ -54,7 +54,11 @@ enum ProviderCatalog {
         glyph: .claudeSpark,
         accent: Dock.Accent.claude,
         detect: { ClaudeCodeDetector.detect()?.source },
-        read: { force in await ClaudeCodeDetector.fetchRealUsage(force: force) }
+        read: { force in
+            var reading = await ClaudeCodeDetector.fetchRealUsage(force: force)
+            reading?.stats = ClaudeCodeDetector.localStats()
+            return reading
+        }
     )
 
     // MARK: - Codex

@@ -249,7 +249,7 @@ enum GeminiDetector {
         )
     }
 
-    private static func computeStreaks(dayBuckets: [Date: Int], today: Date, calendar: Calendar) -> (current: Int, longest: Int) {
+    static func computeStreaks(dayBuckets: [Date: Int], today: Date, calendar: Calendar) -> (current: Int, longest: Int) {
         let activeDays = Set(dayBuckets.filter { $0.value > 0 }.keys)
         guard !activeDays.isEmpty else { return (0, 0) }
 
