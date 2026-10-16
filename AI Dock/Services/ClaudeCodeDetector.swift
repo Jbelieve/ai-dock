@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 /// Detects Anthropic's **Claude Code** CLI on the local machine and reads its
 /// local usage cache to estimate session utilisation — no network calls.
@@ -141,7 +142,8 @@ enum ClaudeCodeDetector {
             return cached.map(clamped)
         }
 
-        surfaces = parseBreakdown(json["seven_day_breakdown"])
+        let breakdown = parseBreakdown(json["seven_day_breakdown"])
+        surfaces.withLock { $0 = breakdown }
         let windows = parseLimits(json["limits"])
         let credits = parseExtraUsage(json["extra_usage"])
         let tier = ClaudeTokenRefresher.oauth()?["rateLimitTier"] as? String
@@ -200,8 +202,10 @@ enum ClaudeCodeDetector {
 
     /// Where the weekly allowance went across the whole account (Claude Code,
     /// chats, Cowork…), as Anthropic reports it.
+    /// Locked rather than main-actor bound: `localStats` is read off the main
+    /// actor, and a main-actor hop there crashed 1.0.7 at launch.
     /// ponytail: in memory only, so it shows after the first fetch of a launch.
-    @MainActor private static var surfaces: [StatRow] = []
+    private static let surfaces = OSAllocatedUnfairLock<[StatRow]>(initialState: [])
 
     private static func parseBreakdown(_ raw: Any?) -> [StatRow] {
         let rows = (raw as? [String: Any])?["rows"] as? [[String: Any]] ?? []
@@ -310,7 +314,6 @@ enum ClaudeCodeDetector {
     /// The hover card's statistics, built from the transcripts the cost index
     /// already holds — the same rows Codex and Gemini show. Local only: usage
     /// from other Macs or claude.ai is not in these files.
-    @MainActor
     static func localStats(now: Date = Date()) -> UsageStats? {
         guard let db = try? CostDatabase() else { return nil }
         let events = db.events(since: nil).filter { $0.model.hasPrefix("claude") }
@@ -347,7 +350,7 @@ enum ClaudeCodeDetector {
             todayLabel: "Today",
             todayValue: fmt(days[today] ?? 0),
             groups: [
-                StatGroup(id: "surfaces", title: "This week · whole account", rows: surfaces),
+                StatGroup(id: "surfaces", title: "This week · whole account", rows: surfaces.withLock { $0 }),
                 StatGroup(id: "projects", title: "This week · by project",
                           rows: projectShare(db.attributed(since: now.addingTimeInterval(-7 * 86_400))))
             ].filter { !$0.rows.isEmpty })
