@@ -22,7 +22,7 @@ struct NotchView: View {
     // MARK: - Geometry (base values at scale 1; everything multiplies by scale)
 
     private static let baseTabWidth: CGFloat = 88
-    private static let basePad: CGFloat = 24
+    private static let basePad: CGFloat = 34
     private static let baseRingPitch: CGFloat = 90
     private static let baseRingSize: CGFloat = 54
 
@@ -49,7 +49,7 @@ struct NotchView: View {
     private var ringSize: CGFloat { Self.baseRingSize * k }
 
     /// Reference height of the hover popover card for tail aiming and bounds.
-    private static let bubbleHeight: CGFloat = 480
+    private static let bubbleHeight: CGFloat = 680
 
     /// Offline preview export: skip live cursor polling during static rendering.
     private static let offlineRender =
