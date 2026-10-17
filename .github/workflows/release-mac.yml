@@ -53,10 +53,10 @@ jobs:
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security import "$RUNNER_TEMP/cert.p12" -k "$KEYCHAIN_PATH" -P "$MAC_CERT_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          # Guardar la search list real del usuario para restaurarla al final
-          # (self-hosted no es efímero: sin esto el Mac pierde su login.keychain).
-          security list-keychains -d user | sed 's/[[:space:]]*"//;s/"$//' > "$RUNNER_TEMP/keychains.orig"
-          security list-keychains -d user -s "$KEYCHAIN_PATH"
+          # Se firma desde este llavero temporal pasado por ruta (codesign --keychain "$SIGN_KEYCHAIN"), SIN tocar la lista de
+          # llaveros del usuario: el runner es el Mac de Jorge, y reemplazar esa lista lo dejaba sin su
+          # llavero de sesión mientras durara el release (y para siempre si la restauración fallaba).
+          echo "SIGN_KEYCHAIN=$KEYCHAIN_PATH" >> "$GITHUB_ENV"
           rm -f "$RUNNER_TEMP/cert.p12"
 
       - name: Archive (Release, arm64)
@@ -74,7 +74,7 @@ jobs:
         run: |
           set -euo pipefail
           APP="build/AIDock.xcarchive/Products/Applications/$APP_NAME.app"
-          codesign --force --options runtime --timestamp \
+          codesign --force --options runtime --timestamp --keychain "$SIGN_KEYCHAIN" \
             --entitlements "AI Dock/Resources/AIDock.entitlements" \
             --sign "$SIGN_IDENTITY" "$APP"
           codesign --verify --strict --verbose=2 "$APP"
@@ -107,22 +107,23 @@ jobs:
           ln -s /Applications "$STAGE/Applications"
           hdiutil create -volname "$APP_NAME" -srcfolder "$STAGE" -ov \
             -format UDZO "release/AI-Dock-$VERSION.dmg"
-          codesign --force --timestamp --sign "$SIGN_IDENTITY" "release/AI-Dock-$VERSION.dmg"
+          codesign --force --timestamp --keychain "$SIGN_KEYCHAIN" --sign "$SIGN_IDENTITY" "release/AI-Dock-$VERSION.dmg"
           rm -rf "$STAGE"
 
       # Devolver la máquina al estado en que estaba (always: también si el
       # build o la notarización fallan).
-      - name: Restore keychain search list (self-hosted cleanup)
+      - name: Clean up temporary keychain (self-hosted)
         if: always()
         run: |
           KEYCHAIN_PATH="$RUNNER_TEMP/release-signing.keychain-db"
-          if [ -s "$RUNNER_TEMP/keychains.orig" ]; then
-            security list-keychains -d user -s $(cat "$RUNNER_TEMP/keychains.orig" | tr '\n' ' ')
-          else
-            security list-keychains -d user -s "$HOME/Library/Keychains/login.keychain-db"
-          fi
           security delete-keychain "$KEYCHAIN_PATH" 2>/dev/null || true
-          rm -f "$RUNNER_TEMP/keychains.orig"
+          # Red de seguridad: si algo sacó el llavero de sesión de Jorge de su lista, se agrega de
+          # vuelta sin quitar ningún otro.
+          if ! security list-keychains -d user | grep -q "login.keychain-db"; then
+            echo "::warning::el llavero de sesión no estaba en la lista de llaveros; se repone"
+            security list-keychains -d user -s "$HOME/Library/Keychains/login.keychain-db" $(security list-keychains -d user | tr -d '"')
+          fi
+          security list-keychains -d user
 
       # Idempotente: si el Release del tag ya existe, no falla.
       - name: Ensure GitHub Release exists
